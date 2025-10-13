@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from 'sonner'; // Toasterをインポート
+import AdminBar from "@/components/common/AdminBar";
+import Header from '@/components/common/Header'; // ★NavBarをインポート
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,8 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} !pt-24`}>
+        <Header />
         {children}
+        <Toaster richColors position="top-center" />
+        <AdminBar />
       </body>
     </html>
   );

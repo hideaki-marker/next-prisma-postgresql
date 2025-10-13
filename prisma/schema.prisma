@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  password   String
+  created_at DateTime  @db.Timestamp(6)
+  reserves   reserve[]
+}
+
+model admin {
+  adm_name   String   @unique @db.VarChar(30)
+  password   String   @db.VarChar(64)
+  exp        String
+  created_at DateTime @db.Timestamp(6)
+
+  @@id([adm_name, password])
+}
+
+model menu {
+  m_id     Int      @id @default(autoincrement())
+  m_name   String   @db.VarChar(100)
+  detail   String?
+  orderFlg Boolean? @default(true)
+  price    Int
+  t_id     Int      @db.SmallInt
+  menuType menuType @relation(fields: [t_id], references: [t_id])
+}
+
+model menuType {
+  t_id         Int     @id @default(autoincrement()) @db.SmallInt
+  t_name       String? @unique @db.VarChar(30)
+  displayOrder Int?    @default(0)
+  menu         menu[]
+}
+
+model table_loc {
+  table_id     Int       @id @default(autoincrement())
+  table_name   String?   @db.VarChar(30)
+  max_capacity Int
+  reserves     reserve[]
+}
+
+model reserve {
+  rsv_id    Int       @id @default(autoincrement())
+  id        Int
+  users     users     @relation(fields: [id], references: [id])
+  rsv_date  DateTime  @db.Timestamp(6)
+  person    Int
+  table_id  Int
+  table_loc table_loc @relation(fields: [table_id], references: [table_id])
+  app_date  DateTime  @default(now()) @db.Timestamp(6)
+}
