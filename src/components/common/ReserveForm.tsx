@@ -65,18 +65,13 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
         // フォーム送信ハンドラのロジックを修正
        // ★修正: ここに以前の clientAction のバリデーションロジックを統合します
         const selectedTable = tableData.find(t => t.table_id === tableId);
+
+        // 1. 選択されたテーブルの最大収容人数を取得 (tableDataを使用)
         if (!selectedTable) {
             toast.error('テーブルの選択が不正です。');
             return;
         }
 
-            // 1. 選択されたテーブルの最大収容人数を取得 (tableDataを使用)
-           
-
-            if (!selectedTable) {
-                toast.error('テーブルの選択が不正です。');
-                return;
-            }
 
             // 2. 人数バリデーションロジック
             const minCapacity = 1;

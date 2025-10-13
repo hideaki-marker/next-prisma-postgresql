@@ -28,7 +28,7 @@ export default async function ShowMenuPage() {
   // ★修正：allMenuItemsの作成は不要になりました。
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div>
       <div className="flex justify-center mb-10">
         <h1 className="font-bold text-5xl">メニュー一覧</h1>
       </div>
