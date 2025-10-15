@@ -32,6 +32,7 @@ model menu {
   price    Int
   t_id     Int      @db.SmallInt
   menuType menuType @relation(fields: [t_id], references: [t_id])
+  courseCtl courseCtl[] 
 }
 
 model menuType {
@@ -39,6 +40,7 @@ model menuType {
   t_name       String? @unique @db.VarChar(30)
   displayOrder Int?    @default(0)
   menu         menu[]
+  course    course[] 
 }
 
 model table_loc {
@@ -57,4 +59,29 @@ model reserve {
   table_id  Int
   table_loc table_loc @relation(fields: [table_id], references: [table_id])
   app_date  DateTime  @default(now()) @db.Timestamp(6)
+}
+
+model course {
+  c_id      Int       @id @default(autoincrement())
+  c_name    String    @db.VarChar(30)
+  detail    String?
+  orderFlg Boolean @default(true)
+  price    Int
+  t_id     Int
+  menuType menuType @relation(fields: [t_id], references: [t_id]) 
+  courseCtl courseCtl[] 
+}
+
+model courseCtl {
+  // 1. 外部キーは参照元の型（おそらくInt）に合わせ、@db.SmallIntは削除
+  c_id     Int
+  m_id     Int
+
+  // 2. 外部キーリレーションの定義
+  course   course @relation(fields: [c_id], references: [c_id])
+  menu     menu   @relation(fields: [m_id], references: [m_id])
+
+  // 3. ★修正: 複合主キーを定義
+  // これにより、「どのコースにどのメニューが含まれるか」が一意に定まります。
+  @@id([c_id, m_id])
 }
