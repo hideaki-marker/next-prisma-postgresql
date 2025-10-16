@@ -90,6 +90,10 @@ export default async function AdminIndex() {
         <p>◆メニュー削除</p>
       </Link>
       <br />
+      <Link href="/courseInsert" className="flex items-center text-4xl justify-center">
+        <p>◆コース追加</p>
+      </Link>
+      <br />
       <LogoutButton />
     </div>
   );
