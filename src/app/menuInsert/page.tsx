@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod"; // zodResolver をイン�
 import { useEffect, useState } from "react"; // useEffect と useState をインポート
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { commonMenuSchema } from "@/components/common/formSchemas";
-
+import { Link } from "lucide-react";
 // フォームのスキーマを定義 (例: Zodを使用)
 // あなたのフォームの入力フィールドに合わせて定義してください
 const formSchema = z.object({
@@ -124,8 +124,9 @@ export default function MenuInsertPage() {
         {/* ★ここまで登録ボタンの修正★ */}
 
         <br /> {/* ボタンの下に管理者ページとのスペースを空けるため */}
-
+        <Link href="/adminIndex" className="flex items-center text-4xl justify-center">
         <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
+        </Link>
       </form>
     </Form>
   );

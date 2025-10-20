@@ -10,7 +10,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button"; // 必要に応じてボタンコンポーネントも追加
-
+import { Link } from "lucide-react";
 // データの表示用なので、フォームスキーマは簡略化
 const formSchema = z.object({
   id: z.string().optional(),
@@ -156,8 +156,9 @@ export default function MenuDeletePage() {
         </div>
 
         <br />
-
-        <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
+        <Link href="/adminIndex" className="flex items-center text-4xl justify-center">
+          <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
+        </Link>
       </div>
     </Form>
   );

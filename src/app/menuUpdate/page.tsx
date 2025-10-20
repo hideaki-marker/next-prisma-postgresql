@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation'; // ★追加: URLパラメータを取得するため
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
-
+import { Link } from "lucide-react";
 // フォームのスキーマを定義
 const formSchema = z.object({
   id: z.string().optional(), // ★追加: 更新対象のID。URLから取得するためoptionalとする
@@ -165,8 +165,9 @@ export default function MenuUpdatePage() { // ★変更: 関数名を MenuUpdate
         </div>
 
         <br />
-
-        <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
+        <Link href="/adminIndex" className="flex items-center text-4xl justify-center">
+          <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
+        </Link>
       </form>
     </Form>
   );
