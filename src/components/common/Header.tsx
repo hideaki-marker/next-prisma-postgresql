@@ -6,7 +6,7 @@ export default function Header() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg h-16">
       <div className="container mx-auto flex items-center justify-between h-full">
         {/* レストラン名を左寄せに */}
-        <Link href="/home" className="text-2xl font-bold text-gray-800">
+        <Link href="/" className="text-2xl font-bold text-gray-800">
           Restaurant italy
         </Link>
         
