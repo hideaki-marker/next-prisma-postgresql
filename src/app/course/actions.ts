@@ -18,6 +18,16 @@ export type CourseData = {
   selectedMenuIds: number[]; 
 };
 
+type UpdateCourseData = {
+    c_id: number; // ★必須
+    c_name: string;
+    price: number;
+    orderFlg: boolean;
+    detail: string | null;
+    t_id: number; // 既存の値を引き継ぐ
+    selectedMenuIds: number[];
+};
+
 // Menuテーブルから取得するデータの型（SelectBox用）
 export type MenuSelectItem = {
     m_id: number;
@@ -102,5 +112,50 @@ export async function insertCourseWithMenus(data: CourseData) {
     } catch (error) {
         console.error('コース登録エラー:', error);
         return { success: false, message: 'コース登録中に予期せぬエラーが発生しました。' };
+    }
+}
+
+// ★★★ 新しいサーバーアクション ★★★
+export async function updateCourseWithMenus(data: UpdateCourseData): Promise<{ success: boolean; message: string }> {
+    const prisma = new PrismaClient();
+    try {
+        await prisma.$transaction(async (tx) => {
+            // 1. コースの基本情報を更新
+            await tx.course.update({
+                where: { c_id: data.c_id },
+                data: {
+                    c_name: data.c_name,
+                    price: data.price,
+                    detail: data.detail,
+                    orderFlg: data.orderFlg,
+                    // t_id は通常変更しないが、必要であれば更新
+                    t_id: data.t_id, 
+                },
+            });
+
+            // 2. 既存の courseCtl (コースとメニューの関連) をすべて削除
+            await tx.courseCtl.deleteMany({
+                where: { c_id: data.c_id },
+            });
+
+            // 3. 新しい選択メニューで courseCtl レコードを一括作成
+            if (data.selectedMenuIds.length > 0) {
+                const newCourseCtl = data.selectedMenuIds.map(m_id => ({
+                    c_id: data.c_id,
+                    m_id: m_id,
+                }));
+
+                await tx.courseCtl.createMany({
+                    data: newCourseCtl,
+                });
+            }
+        });
+
+        return { success: true, message: `コース「${data.c_name}」を正常に更新しました。` };
+    } catch (error) {
+        console.error("Failed to update course:", error);
+        return { success: false, message: 'コースの更新中にエラーが発生しました。' };
+    } finally {
+        await prisma.$disconnect();
     }
 }
