@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 
 export default function ReturnButton({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const href = isLoggedIn ? '/myPage' : '/home';
+  const href = isLoggedIn ? '/myPage' : '/';
   
   return (
     <a href={href}>
