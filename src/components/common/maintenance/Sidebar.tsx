@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 // ★Propsの型定義（page.tsxからコピー）
 type CourseItem = { c_id: number; c_name: string; };
@@ -77,6 +78,16 @@ export default function Sidebar({ allCourses, allMenuTypes }: Props) {
                         </li>
                     ))}
                 </ul>
+                <a href='/adminIndex'>
+                <div className="flex items-center justify-center mb-16">
+                    <Button
+                        variant="outline"
+                        className="bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6"
+                    >
+                        戻る
+                    </Button>
+                </ div>
+                </a>
             </div>
         </nav>
     );
