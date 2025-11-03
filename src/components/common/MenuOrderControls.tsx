@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ReturnButton from './ReturnButton';
 
 
 // ★Prismaから取得されるデータ構造に合わせて型を定義
@@ -60,7 +61,6 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
     <div className="max-w-4xl mx-auto p-4">
       
       {/* ★分類ごとにメニューを表示するループ処理 */}
-      {/* ★分類ごとにメニューを表示するループ処理 */}
       {menuTypes.map(type => (
         <div key={type.t_id} className="mb-12">
           {/* ★t_name が null でないかチェックを追加 */}
@@ -116,10 +116,11 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
       <div className="mt-12 pt-6 border-t border-gray-200 text-center">
         {/* ログインと注文の両方を満たす場合のみ予約ボタンを表示 */}
         {isLoggedIn ? (
-          <Button 
+          <Button
+            size="lg"
             onClick={handleReserve} 
             disabled={!hasOrder} 
-            className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4"
+            className="bg-black hover:bg-gray-800 text-white text-lg py-4"
           >
             メニューを確定し、予約へ進む
           </Button>
@@ -129,12 +130,15 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
               メニューを注文して予約に進むには、ログインが必要です。
             </p>
             <Link href="/login" passHref>
-              <Button className="bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-4">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white text-lg py-4">
                 ログインして予約へ
               </Button>
             </Link>
           </div>
         )}
+        <ReturnButton 
+            isLoggedIn={isLoggedIn}
+          />
       </div>
     </div>
   );
