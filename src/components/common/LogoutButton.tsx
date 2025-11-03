@@ -18,7 +18,7 @@ export default function LogoutButton() {
         toast.success('ログアウトしました');
         // 2秒後にホーム画面にリダイレクト
         setTimeout(() => {
-          router.push('/home');
+          router.push('/');
         }, 2000);
       } else {
         toast.error('ログアウトに失敗しました');
