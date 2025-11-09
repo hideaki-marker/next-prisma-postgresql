@@ -78,12 +78,12 @@ export default async function AdminIndex() {
         {adminName ? `${adminName}様いらっしゃいませ` : 'ゲスト様いらっしゃいませ'}
       </p>
       <br />
-      <Link href="/menuInsert" className="flex items-center text-4xl justify-center">
-        <p>◆メニュー追加</p>
+      <Link href="/menuMaintenance" className="flex items-center text-4xl justify-center">
+        <p>◆メニューメンテナンス</p>
       </Link>
       <br />
-      <Link href="/menuUpdate" className="flex items-center text-4xl justify-center">
-        <p>◆メニュー編集</p>
+      <Link href="/menuInsert" className="flex items-center text-4xl justify-center">
+        <p>◆メニュー追加</p>
       </Link>
       <br />
       <Link href="/menuDelete" className="flex items-center text-4xl justify-center">
