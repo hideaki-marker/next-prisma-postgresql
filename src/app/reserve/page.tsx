@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 // import { getUserIdFromAuthToken } from '@/lib/auth'; 
 import ReserveForm from '@/components/common/ReserveForm'; // 次に作成する予約フォームコンポーネント
 // ★修正: サーバーアクションからテーブル取得関数をインポート
-import { getAllTableLocs, TableLoc } from './actions'; 
+import { getAllTableLocs } from './actions';
+import { TableLoc } from '@/type/db';
 
 export default async function ReservePage() {
     const cookieStore = await cookies();
@@ -25,11 +26,12 @@ export default async function ReservePage() {
     const tableData: TableLoc[] = await getAllTableLocs();
 
     return (
-        <div className="max-w-3xl mx-auto px-4 py-12">
-            <h1 className="text-4xl font-bold mb-8 text-center">ご予約情報の入力</h1>
-            
-             {/* ★修正: 取得したテーブルデータを props として ReserveForm に渡す */}
-            <ReserveForm userId={userId} tableData={tableData} />
+        <div className="w-full flex justify-center py-12">
+            <div className="max-w-3xl w-full px-4">
+                <h1 className="text-4xl font-bold mb-8 text-center">ご予約情報の入力</h1>         
+                 {/* ★修正: 取得したテーブルデータを props として ReserveForm に渡す */}
+                <ReserveForm userId={userId} tableData={tableData} />
+            </div>
         </div>
     );
 }
