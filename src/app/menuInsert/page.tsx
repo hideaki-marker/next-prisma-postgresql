@@ -12,17 +12,7 @@ import { useEffect, useState } from "react"; // useEffect と useState をイン
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { commonMenuSchema } from "@/components/common/formSchemas";
 import { Link } from "lucide-react";
-// フォームのスキーマを定義 (例: Zodを使用)
-// あなたのフォームの入力フィールドに合わせて定義してください
-const formSchema = z.object({
-  menuName: z.string().min(1, { message: "メニュー名は必須です。" }),
-  price: z.number().min(0, { message: "価格は0以上である必要があります。" }),
-  // radioGroup のフィールド名も追加
-  // value は radioGroupItem の値と一致するようにする
-  orderFlg: z.number().min(0).max(1), 
-  menuType:z.string().min(1, { message: "カテゴリーを選択してください。" }), // 新しいフィールド
-  detail: z.string().max(200, { message: "説明は200文字以内です。" }).optional(), // ★追加: description フィールド
-});
+import { Button } from "@/components/ui/button";
 
 type MenuData = z.infer<typeof commonMenuSchema>;
 
@@ -63,7 +53,7 @@ export default function MenuInsertPage() {
   }, [form]); // formインスタンスが変更された場合のみ再実行 (通常は初回のみ)
 
   // フォーム送信時の処理
-  async function onSubmit(values: z.infer<typeof formSchema>) { // async を追加
+  async function onSubmit(values: z.infer<typeof commonMenuSchema>) { // async を追加
   console.log("フォームデータ:", values);
 
   try {
@@ -108,7 +98,7 @@ export default function MenuInsertPage() {
         
         {/* ★ここから登録ボタンの修正★ */}
        <div className="flex justify-center w-full "> 
-          <button
+          <Button
             type="submit"
             className="
               bg-blue-500 hover:bg-blue-700 text-white font-bold
@@ -119,7 +109,7 @@ export default function MenuInsertPage() {
             " 
           >
             登録
-          </button>
+          </Button>
         </div>
         {/* ★ここまで登録ボタンの修正★ */}
 
