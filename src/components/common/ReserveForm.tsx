@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { createReservation } from '@/app/reserve/actions';
+import { TableLoc } from '@/type/db';
 
 type OrderItem = {
     m_id: number;
@@ -15,12 +16,6 @@ type OrderItem = {
 
 // 予約ページへ遷移する際に使用する一時保存キー
 const RESERVATION_ORDER_KEY = 'temp_reservation_order';
-
-export type TableLoc = {
-    table_id: number;
-    table_name: string | null;
-    max_capacity: number;
-};
 
 // ReserveFormProps の型定義
 type ReserveFormProps = {
