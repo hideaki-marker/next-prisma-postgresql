@@ -4,6 +4,7 @@ import { getReservationList, ReservationWithRelations, ReservationListResult } f
 import { format } from 'date-fns'; // 日付の整形に便利なライブラリ (インストールが必要です)
 import { ja } from 'date-fns/locale'; // 日本語ロケール
 import DeleteReservationButton from '@/components/common/DeleteReservationButton';
+import { Button } from '@/components/ui/button';
 
 // ★ 注: date-fns のインストールが必要な場合があります
 // npm install date-fns
@@ -62,6 +63,16 @@ export default async function ReserveListPage() {
                             </div>
                         </div>
                     ))}
+                    <a href='/adminIndex'> 
+                <div className="flex items-center justify-center mb-16">
+                    <Button
+                        variant="outline"
+                        className="bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6"
+                    >
+                        戻る
+                    </Button>
+                </ div>
+                    </a>
                 </div>
             )}
         </div>
