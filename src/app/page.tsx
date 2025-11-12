@@ -21,13 +21,6 @@ export default function HomePage() {
           className="rounded-lg shadow-lg" // Tailwind CSSで角丸と影を追加
         />
       </div>
-
-      {/*
-          ヘッダーに移動したため、以下のリンクは削除しました
-          <Link href="/showMenu" ...>
-          <Link href="/login" ...>
-          <Link href="/userInsert" ...>
-        */}
     </div>
   );
 }
