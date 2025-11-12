@@ -94,6 +94,10 @@ export default async function AdminIndex() {
         <p>◆コース追加</p>
       </Link>
       <br />
+      <Link href="/reserveList" className="flex items-center text-4xl justify-center">
+        <p>◆予約情報</p>
+      </Link>
+      <br />
       <LogoutButton />
     </div>
   );
