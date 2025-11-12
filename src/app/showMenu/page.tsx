@@ -90,14 +90,15 @@ const finalCourseList = Object.values(groupedCourses);
   
 
   return (
-    <div>
+    // ★★★ max-w-7xl (最大幅) と mx-auto (中央寄せ) を追加 ★★★
+  <div className="w-full flex flex-col items-center">
       <div className="flex justify-center mb-10">
-        <h1 className="font-bold text-5xl">メニュー一覧</h1>
+        <h1 className="font-bold text-5xl mt-0 mb-0">メニュー一覧</h1>
       </div>
 
       {/* ★修正：分類情報を含んだ menuType をそのまま渡します。 */}
-      <MenuOrderControls menuTypes={menuType} isLoggedIn={isLoggedIn} />
       <CourseOrderControls courseList={finalCourseList} isLoggedIn={isLoggedIn} />
+      <MenuOrderControls menuTypes={menuType} isLoggedIn={isLoggedIn} />
       {/* 固定表示やReturnButtonは、MenuOrderControls内に統合することを推奨します。 */}
     </div>
   );

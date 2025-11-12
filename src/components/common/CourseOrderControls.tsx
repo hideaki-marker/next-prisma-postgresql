@@ -5,23 +5,6 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-
-// ★Prismaから取得されるデータ構造に合わせて型を定義
-type MenuItem = {
-  m_id: number;
-  m_name: string;
-  detail: string | null;
-  price: number;
-};
-
-type CourseItem = {
-  c_id: number;
-  c_name: string;
-  detail: string | null;
-  price: number;
-  orderFlg: boolean;
-};
-
 type GroupedCourse = {
     c_id: number;
     c_name: string;
@@ -37,7 +20,7 @@ type GroupedCourse = {
 
 const RESERVATION_ORDER_KEY = 'temp_reservation_order';
 
-export default function CourseOrderControls({ courseList, isLoggedIn }: { courseList: GroupedCourse[], isLoggedIn: boolean }) {
+export default function CourseOrderControls({ courseList, isLoggedIn }: { courseList: GroupedCourse[], isLoggedIn: boolean}) {
     console.log('CourseOrderControls received courseList:', courseList);
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
   const router = useRouter(); 
@@ -72,9 +55,9 @@ export default function CourseOrderControls({ courseList, isLoggedIn }: { course
   const hasOrder = Object.values(quantities).some(q => q > 0);
 
   return (
-        <div className="max-w-4xl mx-auto p-4">
+        <div className="p-4">
              {/* 分類ループを削除し、コースリストを直接ループ */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 w-full">
+            <div className="grid grid-cols-1 gap-x-12 gap-y-6 px-4">
             {(courseList || []).map(courseItem => ( // ★ courseList をループ
                 <div key={courseItem.c_id} className="p-4 border rounded-lg shadow-sm flex flex-col justify-between">
                     <div>
