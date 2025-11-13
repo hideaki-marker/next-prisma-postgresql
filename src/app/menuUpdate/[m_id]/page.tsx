@@ -1,16 +1,6 @@
 import  prisma  from '@/lib/prisma';
 import MenuUpdateForm from '@/components/common/menu/MenuUpdateForm';
-
-// ★ クライアントコンポーネントが期待する MenuData 型を定義 (仮)
-// 実際には MenuUpdateForm.tsx からインポートするか、ここで定義が必要です
-type InitialMenuData = {
-    id: string; // m_id
-    menuName: string; // m_name
-    price: number;
-    orderFlg: number; // 0 or 1
-    menuType: string; // t_name
-    detail: string | undefined;
-};
+import { InitialMenuData } from '@/type/db';
 
 // ★ APIルート（app/api/menu/[id]/route.ts）のロジックをここに移植し、直接DBから取得します
 

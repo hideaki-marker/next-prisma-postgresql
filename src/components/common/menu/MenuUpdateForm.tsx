@@ -11,15 +11,7 @@ import { useEffect, useState } from "react";
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
 import { Link } from "lucide-react";
-
-type InitialMenuData = {
-    id: string; // m_id
-    menuName: string; // m_name
-    price: number;
-    orderFlg: number; // 0 or 1
-    menuType: string; // t_name
-    detail: string | undefined;
-};
+import { InitialMenuData } from "@/type/db";
 
 // フォームのスキーマを定義
 const formSchema = z.object({
