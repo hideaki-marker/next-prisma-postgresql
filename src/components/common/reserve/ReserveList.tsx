@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 // ★ ReservationWithRelations 型は必要に応じて import/定義してください
 type ReservationWithRelations = any; 
@@ -54,38 +55,70 @@ export default function ReserveList({ initialReservations }: { initialReservatio
         <div className="w-full flex justify-center py-12">
             <div className="max-w-5xl w-full px-4">
                 <h1 className="text-4xl font-bold mb-8 text-center">予約一覧</h1>
-            
+                    <br />
                 {displayReservations.length === 0 ? (
                     <p className="text-center text-gray-500">現在、予約情報はありません。</p>
                 ) : (
                     <div className="space-y-6">
                         {displayReservations.map((rsv) => (
-                            // ... (JSXの本体は元のコードから全てコピー) ...
-                            <div 
-                                key={rsv.rsv_id} 
-                                className="p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow flex items-start justify-between"
+                            <Card 
+                            key={rsv.rsv_id} 
+                            // 元のクラスから、hover:shadow-lgだけ残して、Cardの標準デザインを活かす
+                            className="w-full hover:shadow-lg transition-shadow" 
                             >
-                                {/* 予約情報本体 */}
-                                <div className="space-y-1 text-gray-700 flex-grow pr-4"> 
-                                    <h2 className="text-2xl font-semibold mb-2">予約ID: {rsv.rsv_id}</h2>
-                                    <p>
-                                        <span className="font-medium">予約日時:</span>{' '}
-                                        {format(rsv.rsv_date, 'yyyy年MM月dd日(E) HH:mm', { locale: ja })}
-                                    </p>
-                                    <p><span className="font-medium">予約者:</span> {rsv.users.name}</p>
-                                    <p><span className="font-medium">人数:</span> {rsv.person} 名</p>
-                                    <p><span className="font-medium">テーブル:</span> {rsv.table_loc.table_name} ({rsv.table_loc.max_capacity}名席)</p>
+                            {/* CardHeaderで予約IDとチェックボックスを横並びに配置 */}
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                {/* 予約IDを CardHeader の Title の代わりとして強調 */}
+                                <h3 className="text-xl font-bold tracking-tight text-gray-800">
+                                予約ID: {rsv.rsv_id}
+                                </h3>
+                                
+                                {/* チェックボックスのエリア */}
+                                <div>
+                                <Checkbox
+                                    checked={selectedReservationIds.includes(rsv.rsv_id)}
+                                    onCheckedChange={(checked) => handleCheckboxChange(rsv.rsv_id, checked as boolean)}
+                                    aria-label={`予約ID ${rsv.rsv_id} を削除対象として選択`}
+                                    // 削除対象がわかりやすいように赤を強調するスタイルはそのまま！
+                                    className="w-6 h-6 border-red-500 data-[state=checked]:bg-red-500 data-[state=checked]:text-white"
+                                />
                                 </div>
-                                {/* チェックボックス */}
-                                <div className="pt-2"> 
-                                    <Checkbox
-                                        checked={selectedReservationIds.includes(rsv.rsv_id)}
-                                        onCheckedChange={(checked) => handleCheckboxChange(rsv.rsv_id, checked as boolean)}
-                                        aria-label={`予約ID ${rsv.rsv_id} を削除対象として選択`}
-                                        className="w-6 h-6 border-red-500 data-[state=checked]:bg-red-500 data-[state=checked]:text-white"
-                                    />
+                            </CardHeader>
+                            
+                            {/* CardContentで予約の詳細情報を定義リスト形式で配置 */}
+                            <CardContent className="pt-2 text-gray-700">
+                                <dl className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                
+                                {/* 予約日時 */}
+                                <div className="col-span-2 md:col-span-1"> {/* 日時は少し幅を取る */}
+                                    <dt className="text-xs font-semibold uppercase text-gray-500">予約日時</dt>
+                                    <dd className="text-sm font-medium">
+                                    {format(rsv.rsv_date, 'yyyy年MM月dd日(E) HH:mm', { locale: ja })}
+                                    </dd>
                                 </div>
-                            </div>
+
+                                {/* 予約者 */}
+                                <div>
+                                    <dt className="text-xs font-semibold uppercase text-gray-500">予約者</dt>
+                                    <dd className="text-sm">{rsv.users.name}</dd>
+                                </div>
+
+                                {/* 人数 */}
+                                <div>
+                                    <dt className="text-xs font-semibold uppercase text-gray-500">人数</dt>
+                                    <dd className="text-sm">{rsv.person} 名</dd>
+                                </div>
+
+                                {/* テーブル */}
+                                <div>
+                                    <dt className="text-xs font-semibold uppercase text-gray-500">テーブル</dt>
+                                    <dd className="text-sm">
+                                    {rsv.table_loc.table_name} ({rsv.table_loc.max_capacity}名席)
+                                    </dd>
+                                </div>
+                                </dl>
+                            </CardContent>
+                            </Card>
                         ))}
                         
                         {/* 一括削除ボタン */}
