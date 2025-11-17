@@ -21,6 +21,7 @@ type LoginFormData = {
 export default function LoginPage() {
   // useStateとメッセージはログイン失敗時のために残す
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('error');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -45,12 +46,14 @@ export default function LoginPage() {
       } else if (response.ok) {
         // ログイン成功時のメッセージを表示
         setMessage('ログインに成功しました！');
+        setMessageType('success');
         // クライアント側でリダイレクトする場合
         router.push('/myPage');
       } else {
         // ログイン失敗時のエラーメッセージ処理
         const errorData = await response.json();
         setMessage(errorData.message || 'ログインに失敗しました。');
+        setMessageType('error');
       }
     } catch (error) {
       console.error('ログイン中にエラーが発生しました:', error);
@@ -103,7 +106,7 @@ export default function LoginPage() {
                   <AlertCircle className="h-4 w-4" /> 
                   
                   {/* メッセージのタイトル（ここでは「エラー」と固定） */}
-                  <AlertTitle>ログインエラー</AlertTitle> 
+                  <AlertTitle>{messageType === 'error' ? 'ログインエラー' : '成功'}</AlertTitle> // ★ タイトルも分岐
                   
                   {/* メッセージ本文 */}
                   <AlertDescription>
