@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 // ★★★ ローディングアイコンをインポート ★★★
 import { Loader2 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react"; // エラー時に使うアイコン
 
 type LoginFormData = {
   name: string;
@@ -58,57 +61,77 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#f4f4f4'
-    }}>
-      <div style={{
-        background: 'white',
-        padding: '30px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
-        <h2>ログイン</h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            type="text"
-            id="name"
-            {...register('name', { required: true })} // register はそのまま利用可能
-            placeholder="ユーザー名"
-            // 元の className は Input コンポーネントのデフォルトスタイルで置き換えられます。
-            // 必要に応じて className="mb-4" のようにマージンのみ残すこともできます。
-            className="mb-4" 
-          />
-          <Input
-            type="password"
-            id="password"
-            {...register('password', { required: true })} // register はそのまま利用可能
-            placeholder="パスワード"
-            // className="mb-4" のみ残す
-            className="mb-4"
-          />
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="!block !w-3/5 !mx-auto p-2 bg-blue-600 hover:bg-blue-700 text-white font-bold border-none rounded-md cursor-pointer text-base"
-          >
-              {isLoading ? (
-            <div className="flex items-center justify-center">
-                {/* Loader2アイコンにアニメーション（spin）を設定 */}
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ログイン処理中...
+    <div className="flex items-center justify-center min-h-screen bg-gray-50"> 
+  
+      {/* 元のフォームを囲む div を Card コンポーネントに置き換える！ */}
+      <Card className="w-full max-w-sm">
+        
+        {/* CardHeaderでタイトル（h2）を配置 */}
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            🔐 ログイン
+          </CardTitle>
+        </CardHeader>
+        
+        {/* CardContentでフォームの中身を配置 */}
+        <CardContent>
+          {/* フォームはそのまま残す */}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {/* ユーザー名入力 */}
+            <div className="grid gap-4"> {/* 入力フィールド間のスペースを統一 */}
+              <Input
+                type="text"
+                id="name"
+                {...register('name', { required: true })}
+                placeholder="ユーザー名"
+                // shadcn の Input はデフォルトで十分なスタイルを持ってるから、classNameは不要
+              />
+            
+              {/* パスワード入力 */}
+              <Input
+                type="password"
+                id="password"
+                {...register('password', { required: true })}
+                placeholder="パスワード"
+              />
             </div>
-            ) : (
-                // 通常時のボタンテキスト
+            
+            {/* ログインメッセージ (エラーメッセージなど) */}
+              {message && (
+                <Alert variant="destructive" className="mt-4"> 
+                  {/* エラーアイコン */}
+                  <AlertCircle className="h-4 w-4" /> 
+                  
+                  {/* メッセージのタイトル（ここでは「エラー」と固定） */}
+                  <AlertTitle>ログインエラー</AlertTitle> 
+                  
+                  {/* メッセージ本文 */}
+                  <AlertDescription>
+                    {message} 
+                  </AlertDescription>
+                </Alert>
+              )}
+            {/* ボタンは CardFooter に移動する方がデザイン的に統一感が出るけど、
+              ここではフォームの直下に残すパターンで、スタイルをshadcn/uiに合わせるね！ */}
+            <Button
+              type="submit"
+              disabled={isLoading}
+              // shadcn の Button の基本スタイルを活かしつつ、幅を full に変更
+              className="w-full mt-6"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ログイン処理中...
+                </div>
+              ) : (
                 'ログイン'
-            )}
-          </Button>
-          {message && <div className="mt-4 text-center text-red-600">{message}</div>}
-        </form>
-      </div>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        
+      </Card>
     </div>
   );
 }
