@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'sonner'; // Toasterをインポート
 import AdminBar from "@/components/common/AdminBar";
 import Header from '@/components/common/Header'; // ★NavBarをインポート
+
+// 2. フォントを定義
+const zenKaku = Zen_Kaku_Gothic_New({
+  // ★ 必須設定: フォントの太さを指定
+  weight: ["400", "700"], // サイトで使う標準と太字のウェイトを指定
+  // ★ 必須設定: フォントのサブセット（軽量化）
+  subsets: ["latin"],
+  // ★ 任意のCSS変数名を設定（Tailwindで使う名前）
+  variable: '--font-zenkaku',
+});
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} !pt-24`}>
+    <html lang="ja" className={`${zenKaku.variable}`}>
+      <body className='!pt-24'>
         <Header />
         {children}
         <Toaster richColors position="top-center" />
