@@ -3,6 +3,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@radix-ui/react-label';
+import { Button } from '@/components/ui/button';
 
 export default function UserInsertPage() {
   const [name, setName] = useState('');
@@ -40,11 +43,11 @@ export default function UserInsertPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">ユーザー登録</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">新規お客様登録</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">ユーザー名</label>
-            <input
+            <Label className="block text-sm font-medium text-gray-700">ユーザー名</Label>
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -53,8 +56,8 @@ export default function UserInsertPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">パスワード</label>
-            <input
+            <Label className="block text-sm font-medium text-gray-700">パスワード</Label>
+            <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -62,12 +65,12 @@ export default function UserInsertPage() {
               required
             />
           </div>
-          <button
+          <Button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             登録
-          </button>
+          </Button>
         </form>
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
       </div>
