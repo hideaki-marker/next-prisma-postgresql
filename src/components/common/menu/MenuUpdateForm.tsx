@@ -10,8 +10,36 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
-import { Link } from "lucide-react";
+import Link from "next/link";
 import { InitialMenuData } from "@/type/db";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Loader2 } from "lucide-react";
+
+// ----------------------------------------------------
+// ★ 1. 渡されるデータの型をエラーメッセージを元に定義する (PassedMenuData)
+// ----------------------------------------------------
+type PassedMenuData = {
+    menuType: {
+        t_name: string | null;
+    };
+} & {
+    price: number;
+    orderFlg: boolean | null;
+    detail: string | null;
+    t_id: number;
+    m_id: number; // DBのメニューID
+    m_name: string;
+};
+
+// ----------------------------------------------------
+// ★ 2. Props の定義を修正する
+// ----------------------------------------------------
+type Props = {
+    // フォームに渡されるProp名を 'menuData' に変更し、型を PassedMenuData に変更
+    menuData: PassedMenuData; 
+    menuTypeOptions: string[];
+}
 
 // フォームのスキーマを定義
 const formSchema = z.object({
@@ -27,24 +55,22 @@ const formSchema = z.object({
 // Prismaの生成型を使用することもできますが、ここではZodスキーマを元に定義します
 type MenuData = z.infer<typeof formSchema>;
 
-type Props = {
-    initialData: InitialMenuData;
-    menuTypeOptions: string[];
-}
 
-
-export default function MenuUpdateForm({ initialData, menuTypeOptions }: Props) {
+// ----------------------------------------------------
+// ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
+// ----------------------------------------------------
+export default function MenuUpdateForm({ menuData, menuTypeOptions }: Props) {
   
    
   const form = useForm<MenuData>({ // ★変更: MenuData を型として指定
     resolver: zodResolver(updateMenuSchema),
     defaultValues: {
-             id: initialData.id, 
-             menuName: initialData.menuName,
-             price: initialData.price,
-             orderFlg: initialData.orderFlg,
-             menuType: initialData.menuType,
-             detail: initialData.detail || "",
+             id: String(menuData.m_id), 
+             menuName: menuData.m_name,
+             price: menuData.price,
+             orderFlg: menuData.orderFlg === true ? 1 : 0,
+             menuType: menuData.menuType.t_name || "",
+             detail: menuData.detail || "",
         },
   });
 
@@ -106,42 +132,61 @@ export default function MenuUpdateForm({ initialData, menuTypeOptions }: Props) 
   }
 
   return (
+    // ページ全体の中央寄せは、このコンポーネントの外側で設定するとして、
+    // ここではフォーム本体を Card で美しく囲むよ！
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* ★変更: ページタイトルを更新用に変更 */}
-        <h1 className="font-bold text-5xl mb-8 flex items-center justify-center">メニューの更新</h1>
-
-        {/* メニューID表示（デバッグ用、本番では非表示/隠しフィールドでも良い） */}
-        {initialData.id && (
-            <div className="flex flex-col items-center mb-4">
-                <FormLabel>更新対象ID:</FormLabel>
-                <p className="font-bold text-xl">{initialData.id}</p>
-            </div>
-        )}
-        <br />
-
-        {/* MenuFormFields に Props で受け取った options を渡す */}
-                <MenuFormFields control={form.control} menuTypeOptions={menuTypeOptions} />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl mx-auto space-y-8 p-4 md:p-6">
         
-        <div className="flex justify-center w-full">
-          <button
-            type="submit"
-            className="
-              bg-blue-500 hover:bg-blue-700 text-white font-bold
-              py-3 px-8 rounded-lg text-lg tracking-wider
-              transition-colors duration-200 ease-in-out
-              w-1/4 md:w-1/6 lg:w-1/12 xl:w-1/12
-              mx-auto
-            " 
-          >
-            更新 {/* ★変更: ボタンのテキストを「更新」に変更 */}
-          </button>
-        </div>
+        <Card>
+          
+          {/* ページのヘッダー部分 */}
+          <CardHeader className="border-b">
+            <div className="flex items-center justify-between">
+              {/* 戻るリンクを Button でスタイリッシュに */}
+              <Link href="/adminIndex" passHref>
+                <Button variant="ghost" size="sm" className="space-x-1">
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>管理者ページへ</span>
+                </Button>
+              </Link>
+              
+              {/* タイトル */}
+              <CardTitle className="text-3xl font-bold tracking-tight flex-1 text-center pr-12">
+                メニューの更新
+              </CardTitle>
+            </div>
+          </CardHeader>
 
-        <br />
-        <Link href="/adminIndex" className="flex items-center text-4xl justify-center">
-          <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
-        </Link>
+          <CardContent className="pt-6">
+            
+            {/* メニューID表示（強調） */}
+            <div className="text-center mb-6 p-3 bg-gray-50 border rounded-lg">
+              <p className="text-sm text-gray-500">更新対象メニューID:</p>
+              <p className="font-extrabold text-2xl text-blue-600">{menuData.m_id}</p>
+            </div>
+
+            {/* MenuFormFields 本体 */}
+            <MenuFormFields control={form.control} menuTypeOptions={menuTypeOptions} />
+
+          </CardContent>
+
+          <CardFooter className="pt-6 border-t flex justify-center">
+            {/* 更新ボタンを shadcn の Button に変更 */}
+            <Button 
+              type="submit"
+              size="lg" // 大きめのボタンで目立たせる
+              className="w-1/2 md:w-1/3 text-lg"
+              disabled={form.formState.isSubmitting} // ロード状態は formState を使うとスマート
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                'メニューを更新'
+              )}
+            </Button>
+          </CardFooter>
+          
+        </Card>
       </form>
     </Form>
   );
