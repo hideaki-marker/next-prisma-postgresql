@@ -13,7 +13,11 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // shadcnや独自のテーマ設定があればここに記述
+      fontFamily: {
+        // ★ 'sans' (デフォルトのフォント) を Noto Sans JP に置き換える
+        // 変数名は `notoSansJp.variable` で指定した `--font-noto` を使う
+        sans: ['var(--font-zenkaku)', 'sans-serif'], 
+      },
     },
   },
   plugins: [
