@@ -3,10 +3,9 @@ import { Utensils, LogIn, UserPlus } from 'lucide-react';
 
 export default function Header() {
   return (
-    // fixed で全幅を確保
+    
     <nav className="bg-white shadow-lg">
       
-      {/* 修正ポイント: containerを使いつつ、w-full flex-nowrap を追加して左右を分離 */}
       <div className="container mx-auto flex items-center justify-between h-full">
         
         {/* レストラン名 (左) */}
