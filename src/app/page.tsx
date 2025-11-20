@@ -2,7 +2,7 @@ import Image from 'next/image'; // Imageコンポーネクトをインポート
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="pt-24 mx-auto max-w-7xl px-4 md:pt-32">
       <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">Restaurant italy</h1>
       <br />
       <p className="flex items-center justify-center mb-8">ようこそ！レストランイタリィへ</p>

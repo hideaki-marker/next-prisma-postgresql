@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import Sidebar from '@/components/common/maintenance/Sidebar';
 import MaintenanceContent from '@/components/common/maintenance/MaintenanceContent'; // ★後で作成
+import MenuClientContent from '@/components/common/maintenance/MenuClientContent';
 
 // サイドバーで表示するデータを取得
 async function getMasterData() {
@@ -28,7 +29,7 @@ async function getMasterData() {
 
 export default async function MenuMaintenancePage() {
     // サーバーサイドでデータ取得
-    const { allCourses, allMenuTypes } = await getMasterData();
+    const { allCourses, allMenuTypes, allMenus } = await getMasterData(); // ★ 全メニューデータも取得するはず！
 
     return (
         <div className="flex min-h-screen">
@@ -44,7 +45,7 @@ export default async function MenuMaintenancePage() {
 
             {/* 2. メインコンテンツエリア */}
             <div className="flex-1 p-8">
-                <MaintenanceContent />
+                <MenuClientContent initialMenus={allMenus} initialMenuTypes={allMenuTypes} />
             </div>
         </div>
     );

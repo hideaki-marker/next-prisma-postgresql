@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"; // 編集・削除ボタン用
+import { Dialog,DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from 'sonner';
+import MenuUpdateForm from '../menu/MenuUpdateForm';
 
 // サーバーアクションから型をインポート
 import { 
@@ -13,6 +15,16 @@ import {
     CourseDetail 
 } from '@/app/menuMaintenance/actions';
 
+// --------------------------------------------------------
+// 1. Props の型を定義する
+// --------------------------------------------------------
+interface MaintenanceContentProps {
+    // 💡 menuList はメニューの配列なので any[] で一旦受け取る（より厳密な型があればそれに変えてね！）
+    menuList: any[]; 
+    
+    // 💡 menuTypeOptions は string の配列
+    menuTypeOptions: string[];
+}
 
 // 表示状態の型
 type ContentState = {
@@ -23,7 +35,7 @@ type ContentState = {
     loading: boolean;
 };
 
-export default function MaintenanceContent() {
+export default function MaintenanceContent({ menuTypeOptions }: MaintenanceContentProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     
@@ -127,7 +139,7 @@ export default function MaintenanceContent() {
 
             {/* メニュー分類ごとのメニュー一覧表示 */}
             {content.type === 'menuType' && content.data && Array.isArray(content.data) && (
-                <MenuTable menus={content.data as MenuDetail[]} handleDelete={handleDelete} router={router}/>
+                <MenuTable menus={content.data as MenuDetail[]} handleDelete={handleDelete} router={router} menuTypeOptions={menuTypeOptions}/>
             )}
 
             {/* データなしの場合のメッセージ */}
@@ -159,7 +171,7 @@ const CourseDisplay = ({ course, handleDelete, router }:
         
         <h4 className="font-bold mt-4 border-t pt-2">構成メニュー</h4>
         <ul className="list-disc list-inside ml-4">
-            {course.courseCtl.map((ctl, index) => (
+            {course.courseCtl.map((ctl: any, index: any) => (
                 <li key={index}>{ctl.menu.m_name}</li>
             ))}
         </ul>
@@ -168,10 +180,11 @@ const CourseDisplay = ({ course, handleDelete, router }:
 
 
 // メニュー一覧テーブル表示コンポーネント (補助)
-const MenuTable = ({ menus, handleDelete, router }: 
+const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }: 
         { menus: MenuDetail[],
           handleDelete: (t: 'course' | 'menu', id: number) => void,
           router: ReturnType<typeof useRouter>
+          menuTypeOptions: string[] // ★ Propsの型定義にも string[] を追加！
         }) => (
     <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
@@ -192,7 +205,32 @@ const MenuTable = ({ menus, handleDelete, router }:
                         <td className="py-2 px-4 border-b text-right">¥{menu.price.toLocaleString()}</td>
                         <td className="py-2 px-4 border-b text-center">{menu.orderFlg ? '✅' : '❌'}</td>
                         <td className="py-2 px-4 border-b text-center space-x-2">
-                            <Button size="sm" variant="outline" onClick={() => router.push(`/menuUpdate/${menu.m_id}`)}>編集</Button>
+                            <Dialog>
+                            {/* 1. 編集ボタンをトリガーにする！ */}
+                            <DialogTrigger asChild>
+                                <Button size="sm" variant="outline">
+                                編集
+                                </Button>
+                            </DialogTrigger>
+
+                            {/* 2. モーダルの内容を定義する！ */}
+                            <DialogContent className="sm:max-w-[425px] max-w-2xl"> 
+                                <DialogHeader>
+                                <DialogTitle>メニュー編集: {menu.m_name}</DialogTitle>
+                                <DialogDescription>
+                                    メニュー情報を編集して「保存」をクリックしてください。
+                                </DialogDescription>
+                                </DialogHeader>
+
+                                {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
+                                {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
+                                <MenuUpdateForm menuData={menu} menuTypeOptions={menuTypeOptions}/> 
+                                
+                                {/* 編集フォームのコンポーネントを作るときは、
+                                フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
+
+                            </DialogContent>
+                            </Dialog>
                             <Button size="sm" variant="destructive" onClick={() => handleDelete('menu', menu.m_id)}>削除</Button>
                         </td>
                     </tr>

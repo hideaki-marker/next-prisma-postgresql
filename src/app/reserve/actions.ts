@@ -1,6 +1,7 @@
 'use server';
 
 import { PrismaClient, Prisma } from '@prisma/client'; 
+import { TableLoc } from '@/type/db';
 
 const prisma = new PrismaClient();
 
@@ -135,13 +136,6 @@ export async function deleteReservation(rsvId: number) {
         return { success: false, message: '予約削除中にエラーが発生しました。' };
     }
 }
-
-// table_loc のレコード型をエクスポート
-export type TableLoc = {
-    table_id: number;
-    table_name: string | null;
-    max_capacity: number;
-};
 
 // table_locの全レコードを取得するサーバーアクション
 export async function getAllTableLocs(): Promise<TableLoc[]> {

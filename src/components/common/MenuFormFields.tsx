@@ -44,7 +44,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
           <FormItem className="flex flex-col items-center">
             <FormLabel>メニュー名</FormLabel>
             <FormControl className="w-full flex justify-center">
-              <Input type="text" placeholder="名前" {...field} className="w-1/3 mx-auto" />
+              <Input type="text" placeholder="名前" {...field} className="w-2/3 mx-auto" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -64,7 +64,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
                 type="number"
                 placeholder="価格"
                 {...field}
-                className="w-1/3 mx-auto"
+                className="w-2/3 mx-auto"
                 onChange={(event) => field.onChange(Number(event.target.value))}
               />
             </FormControl>
@@ -116,7 +116,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
             <FormLabel>カテゴリー</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl className="w-full flex justify-center">
-                <SelectTrigger className="w-1/3 mx-auto">
+                <SelectTrigger className="w-2/3 mx-auto">
                   <SelectValue placeholder="カテゴリーを選択" />
                 </SelectTrigger>
               </FormControl>
@@ -144,7 +144,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
             <FormControl className="w-full flex justify-center">
               <Textarea
                 placeholder="メニューの詳細な説明を入力してください。"
-                className="resize-y w-1/3 mx-auto"
+                className="resize-y w-2/3 mx-auto"
                 {...field}
               />
             </FormControl>

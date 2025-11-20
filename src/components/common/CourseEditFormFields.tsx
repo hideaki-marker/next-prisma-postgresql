@@ -9,23 +9,13 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { updateCourseWithMenus, // ★新規作成する更新用アクション
      MenuSelectItem } from '@/app/course/actions';
-
-     // ★★★ 1. 新しい型定義の追加 ★★★
-// 編集対象のコースの基本データ型を定義 (PrismaのCourseモデルのサブセット)
-type CourseData = {
-    c_id: number;
-    c_name: string;
-    price: number;
-    detail: string | null;
-    orderFlg: boolean;
-    t_id: number;
-};
+import { Course } from '@/type/db';
 
 type Props = {
     // ページコンポーネントから渡される全メニューデータ
     menuItems: MenuSelectItem[];
     // ★編集用に追加: 既存のコースデータ
-    initialCourse: CourseData;
+    initialCourse: Course;
     // ★編集用に追加: 既存のコースに紐づいているメニューIDの配列
     initialMenuIds: number[];
 };

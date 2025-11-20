@@ -64,10 +64,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50"> 
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
   
       {/* 元のフォームを囲む div を Card コンポーネントに置き換える！ */}
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm mx-auto">
         
         {/* CardHeaderでタイトル（h2）を配置 */}
         <CardHeader className="text-center">
@@ -81,12 +81,13 @@ export default function LoginPage() {
           {/* フォームはそのまま残す */}
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* ユーザー名入力 */}
-            <div className="grid gap-4"> {/* 入力フィールド間のスペースを統一 */}
+            <div className="space-y-4"> {/* 入力フィールド間のスペースを統一 */}
               <Input
                 type="text"
                 id="name"
                 {...register('name', { required: true })}
                 placeholder="ユーザー名"
+                className=""
                 // shadcn の Input はデフォルトで十分なスタイルを持ってるから、classNameは不要
               />
             
@@ -96,6 +97,7 @@ export default function LoginPage() {
                 id="password"
                 {...register('password', { required: true })}
                 placeholder="パスワード"
+                className=""
               />
             </div>
             
@@ -120,7 +122,7 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading}
               // shadcn の Button の基本スタイルを活かしつつ、幅を full に変更
-              className="w-full mt-6"
+              className="!w-full !h-10 !min-h-10"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
