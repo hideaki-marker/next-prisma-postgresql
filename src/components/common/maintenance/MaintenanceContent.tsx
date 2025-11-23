@@ -51,12 +51,6 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
         loading: false,
     });
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        // ★必要であれば、ここでメニュー一覧を再取得（リフレッシュ）する処理も追加
-    };
 
     // クエリパラメータの変更を監視し、データを取得する
     useEffect(() => {
