@@ -39,6 +39,7 @@ type Props = {
     // フォームに渡されるProp名を 'menuData' に変更し、型を PassedMenuData に変更
     menuData: PassedMenuData; 
     menuTypeOptions: string[];
+    onClose: () => void;
 }
 
 // フォームのスキーマを定義
@@ -59,7 +60,7 @@ type MenuData = z.infer<typeof formSchema>;
 // ----------------------------------------------------
 // ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
 // ----------------------------------------------------
-export default function MenuUpdateForm({ menuData, menuTypeOptions }: Props) {
+export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: Props) {
   
    
   const form = useForm<MenuData>({ // ★変更: MenuData を型として指定
@@ -121,10 +122,11 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions }: Props) {
 
       const data = await response.json();
       console.log("更新成功:", data);
-      alert('メニューが正常に更新されました！'); // 成功メッセージを表示
+      // alert('メニューが正常に更新されました！'); // 成功メッセージを表示
       // form.reset(); // 更新なのでリセットは不要、または更新された値で再設定
       // 必要であれば、更新後に別のページにリダイレクトすることも可能
       // useRouter().push('/showMenu'); など
+      onClose();
     } catch (error) {
       console.error("メニュー更新エラー:", error);
       alert(`エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`);

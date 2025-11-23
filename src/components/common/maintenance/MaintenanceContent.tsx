@@ -51,6 +51,13 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
         loading: false,
     });
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        // ★必要であれば、ここでメニュー一覧を再取得（リフレッシュ）する処理も追加
+    };
+
     // クエリパラメータの変更を監視し、データを取得する
     useEffect(() => {
         if (!queryType || !queryId) {
@@ -185,7 +192,24 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
           handleDelete: (t: 'course' | 'menu', id: number) => void,
           router: ReturnType<typeof useRouter>
           menuTypeOptions: string[] // ★ Propsの型定義にも string[] を追加！
-        }) => (
+        }) => {
+
+            // ★★★ 追加: 開いているメニューIDを管理する状態 ★★★
+    // null: モーダルが閉じている / number: 開いているメニューのm_id
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
+    // ★★★ 追加: モーダルを閉じる処理 ★★★
+    const handleCloseModal = (updatedMenuId: number) => {
+        setOpenMenuId(null); // モーダルを閉じる
+        
+        // ★★★ 更新後のデータ再取得ロジック ★★★
+        toast.success(`メニューID: ${updatedMenuId} が更新されました。`);
+        // データ再取得が必要な場合は、ここで親コンポーネントのデータをリフレッシュする処理を呼び出す
+        // 例: router.refresh() などを親から渡してもらうか、ここでURLクエリを再設定する
+        // router.replace(`?type=${queryType}&id=${queryId}`);
+    };
+
+    return (
     <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
@@ -205,7 +229,10 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                         <td className="py-2 px-4 border-b text-right">¥{menu.price.toLocaleString()}</td>
                         <td className="py-2 px-4 border-b text-center">{menu.orderFlg ? '✅' : '❌'}</td>
                         <td className="py-2 px-4 border-b text-center space-x-2">
-                            <Dialog>
+                            <Dialog 
+                                open={openMenuId === menu.m_id} // ⬅️ openMenuId が現在のメニューIDと一致したら開く
+                                onOpenChange={(open: boolean) => setOpenMenuId(open ? menu.m_id : null)} // ⬅️ 開閉時、状態を更新する
+                            >
                             {/* 1. 編集ボタンをトリガーにする！ */}
                             <DialogTrigger asChild>
                                 <Button size="sm" variant="outline">
@@ -224,7 +251,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
 
                                 {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
                                 {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
-                                <MenuUpdateForm menuData={menu} menuTypeOptions={menuTypeOptions}/> 
+                                <MenuUpdateForm menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
                                 
                                 {/* 編集フォームのコンポーネントを作るときは、
                                 フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
@@ -238,4 +265,5 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
             </tbody>
         </table>
     </div>
-);
+    )
+    };
