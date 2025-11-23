@@ -1,6 +1,7 @@
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss' // 型をインポート
+import defaultTheme from 'tailwindcss/defaultTheme' // デフォルトテーマのフォントをインポート
+
+const config: Config = {
   // ★★★ 最も重要な設定 ★★★
   content: [
     // アプリケーションのすべてのコンポーネント、ページ、ライブラリファイルを指定
@@ -16,7 +17,7 @@ module.exports = {
       fontFamily: {
         // ★ 'sans' (デフォルトのフォント) を Noto Sans JP に置き換える
         // 変数名は `notoSansJp.variable` で指定した `--font-noto` を使う
-        sans: ['var(--font-zenkaku)', 'sans-serif'], 
+          sans: ['var(--font-zenkaku)', ...defaultTheme.fontFamily.sans],
       },
     },
   },
@@ -24,3 +25,5 @@ module.exports = {
     require("tailwindcss-animate"), // shadcnで使われていることが多いプラグイン
   ],
 }
+
+export default config
