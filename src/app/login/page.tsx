@@ -108,7 +108,7 @@ export default function LoginPage() {
                   <AlertCircle className="h-4 w-4" /> 
                   
                   {/* メッセージのタイトル（ここでは「エラー」と固定） */}
-                  <AlertTitle>{messageType === 'error' ? 'ログインエラー' : '成功'}</AlertTitle> // ★ タイトルも分岐
+                  <AlertTitle>{messageType === 'error' ? 'ログインエラー' : '成功'}</AlertTitle>
                   
                   {/* メッセージ本文 */}
                   <AlertDescription>
