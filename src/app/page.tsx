@@ -2,14 +2,14 @@ import Image from 'next/image'; // Imageコンポーネクトをインポート
 
 export default function HomePage() {
   return (
-    <div className="pt-24 mx-auto max-w-7xl px-4 md:pt-32">
+    <div className="pt-24 w-full px-4 md:pt-32">
       <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">Restaurant italy</h1>
       <br />
       <p className="flex items-center justify-center mb-8">ようこそ！レストランイタリィへ</p>
       <br />
 
       {/* トップ画像を表示 */}
-      <div className="relative w-full h-[500px]"> {/* 画像とH1タイトルの間に余白 */}
+      <div className="relative w-full aspect-video"> {/* 画像とH1タイトルの間に余白 */}
         <Image
           src="/toppage.png" // publicディレクトリからの相対パス
           alt="Restaurant Italy Top Image"
