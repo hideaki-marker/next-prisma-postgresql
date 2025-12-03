@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
 import Link from "next/link";
-import { InitialMenuData } from "@/type/db";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Loader2 } from "lucide-react";
@@ -61,8 +60,7 @@ type MenuData = z.infer<typeof formSchema>;
 // ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
 // ----------------------------------------------------
 export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: Props) {
-  
-   
+
   const form = useForm<MenuData>({ // ★変更: MenuData を型として指定
     resolver: zodResolver(updateMenuSchema),
     defaultValues: {
@@ -75,6 +73,25 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
         },
   });
 
+  useEffect(() => {
+        if (menuData) {
+            // 親から渡された最新の menuData をフォームの型に変換
+            const transformedData: MenuData = {
+                id: String(menuData.m_id), 
+                menuName: menuData.m_name,
+                price: menuData.price,
+                orderFlg: menuData.orderFlg === true ? 1 : 0, 
+                // 安全なアクセス：オプショナルチェイニング `?.` を使用
+                menuType: menuData.menuType?.t_name || "", 
+                detail: menuData.detail || "",
+            };
+            
+            // ★ form.reset を実行して、最新データでフォームの状態を強制的に更新 ★
+            form.reset(transformedData); 
+        }
+        // menuData が変更されたとき、このフォームも再初期化される
+    }, [menuData, form]);
+  
   const [menuType, setMenuType] = useState<string[]>([]); // ★変更: 変数名を menuType から menuTypeOptions に変更
 
   // カテゴリー（menuType）の取得
@@ -120,13 +137,14 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
         throw new Error(errorData.message || 'メニューの更新に失敗しました。');
       }
 
-      const data = await response.json();
-      console.log("更新成功:", data);
+      const updatedMenuData: PassedMenuData = await response.json();
+      console.log("更新成功:", updatedMenuData);
       // alert('メニューが正常に更新されました！'); // 成功メッセージを表示
       // form.reset(); // 更新なのでリセットは不要、または更新された値で再設定
       // 必要であれば、更新後に別のページにリダイレクトすることも可能
       // useRouter().push('/showMenu'); など
       onClose();
+      window.location.reload();
     } catch (error) {
       console.error("メニュー更新エラー:", error);
       alert(`エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`);

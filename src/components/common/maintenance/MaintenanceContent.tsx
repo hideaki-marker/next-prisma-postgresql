@@ -245,7 +245,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
 
                                 {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
                                 {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
-                                <MenuUpdateForm menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
+                                <MenuUpdateForm key={menu.m_id} menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
                                 
                                 {/* 編集フォームのコンポーネントを作るときは、
                                 フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
