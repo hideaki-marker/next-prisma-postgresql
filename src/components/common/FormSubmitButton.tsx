@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react"; // ローディングアイコンをインポート
+import { cn } from "@/lib/utils";
 import * as React from 'react';
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button>;
@@ -13,16 +14,13 @@ interface FormSubmitButtonProps extends ButtonProps {
 export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitButtonProps>(
   ({ isLoading, loadingText = "処理中...", children, className, ...props }, ref) => {
     
-    // 共通のスタイルを定義
-    const baseClassName = "!w-full !h-10 !min-h-10";
-    
     return (
       <Button
         ref={ref}
         type="submit"
         disabled={isLoading}
         // 既存の className と共通スタイルを結合
-        className={`${baseClassName} ${className || ''}`} 
+        className={cn("w-full h-10 min-h-10", className)}
         {...props} // その他の ButtonProps (variant, size など) を展開
       >
         {isLoading ? (
