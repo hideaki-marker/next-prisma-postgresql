@@ -12,13 +12,13 @@ interface FormSubmitButtonProps extends ButtonProps {
 }
 
 export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitButtonProps>(
-  ({ isLoading, loadingText = "処理中...", children, className, ...props }, ref) => {
+  ({ isLoading, loadingText = "処理中...", children, className, disabled, ...props }, ref) => {
     
     return (
       <Button
         ref={ref}
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         // 既存の className と共通スタイルを結合
         className={cn("w-full h-10 min-h-10", className)}
         {...props} // その他の ButtonProps (variant, size など) を展開
