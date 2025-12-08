@@ -5,6 +5,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import { FormSubmitButton } from '@/components/common/FormSubmitButton';
+import ReturnButton from '@/components/common/ReturnButton';
+import { boolean } from 'zod';
 
 type LoginFormData = {
   name: string;
@@ -15,11 +21,14 @@ export default function AdminLoginPage() {
   // useStateとメッセージはログイン失敗時のために残す
   const [message, setMessage] = useState('');
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // useFormでフォームの状態を管理
   const { register, handleSubmit } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/adminLogin', {
         method: 'POST',
@@ -45,6 +54,8 @@ export default function AdminLoginPage() {
     } catch (error) {
       console.error('管理者ページログイン中にエラーが発生しました:', error);
       setMessage('サーバーエラーが発生しました。');
+    } finally{
+      setIsLoading(false);
     }
   };
 
@@ -64,48 +75,36 @@ export default function AdminLoginPage() {
       }}>
         <h2>管理者ページログイン</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <input
+          <Input
             type="text"
             id="name"
             {...register('name', { required: true })} // registerのみを使用
             placeholder="管理者名"
-            style={inputStyle}
+            className=""
           /><br />
-          <input
+          <Input
             type="password"
             id="password"
             {...register('password', { required: true })} // registerのみを使用
             placeholder="パスワード"
-            style={inputStyle}
+            className=""
           /><br />
-          <button type="submit" style={buttonStyle}>ログイン</button>
-          {message && <div style={messageStyle}>{message}</div>}
-        </form>
-      </div>
-    </div>
-  );
-}
+          <FormSubmitButton
+            isLoading={isLoading}
+            loadingText="ログイン処理中..." // ローディング時のテキストを指定 (省略可)
+            className="bg-green-700 hover:bg-green-800 text-white"
+          >
+            ログイン {/* children が通常時のテキストとして表示されます */}
+          </FormSubmitButton>
+                    {message && <div style={messageStyle}>{message}</div>}
+                  </form>
+                  <ReturnButton isLoggedIn={isLoggedIn} />
+                </div>
+              </div>
+            );
+          }
 
 // スタイルの定義 (変更なし)
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  marginBottom: '15px',
-  border: '1px solid #ddd',
-  borderRadius: '4px',
-  boxSizing: 'border-box',
-};
-
-const buttonStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  backgroundColor: '#007bff',
-  color: 'white',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  fontSize: '16px',
-};
 
 const messageStyle: React.CSSProperties = {
   marginTop: '15px',
