@@ -44,6 +44,7 @@ export default function AdminLoginPage() {
       } else if (response.ok) {
         // ログイン成功時のメッセージを表示
         setMessage('管理者ページにログインに成功しました！');
+        setIsLoggedIn(true);
         // クライアント側でリダイレクトする場合
         router.push('/adminIndex');
       } else {
@@ -54,7 +55,7 @@ export default function AdminLoginPage() {
     } catch (error) {
       console.error('管理者ページログイン中にエラーが発生しました:', error);
       setMessage('サーバーエラーが発生しました。');
-    } finally{
+    } finally {
       setIsLoading(false);
     }
   };
