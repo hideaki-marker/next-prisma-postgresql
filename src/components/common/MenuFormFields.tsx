@@ -64,7 +64,8 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
                 type="number"
                 placeholder="価格"
                 {...field}
-                className="w-2/3 mx-auto"
+                value={field.value == null || field.value === 0 ? '' : String(field.value)}
+                className="w-2/3 mx-auto [appearance:textfield] [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
                 onChange={(event) => field.onChange(Number(event.target.value))}
               />
             </FormControl>
