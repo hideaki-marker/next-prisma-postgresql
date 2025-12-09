@@ -91,7 +91,7 @@ export default function AdminLoginPage() {
               placeholder="パスワード"
               className=""
             /><br />
-            {errors.name && <p className="text-red-500 text-sm mt-1">管理者名は必須です</p>}
+            {errors.password && <p className="text-red-500 text-sm mt-1">パスワードは必須です</p>}
             <FormSubmitButton
               isLoading={isLoading}
               loadingText="ログイン処理中..." // ローディング時のテキストを指定 (省略可)
