@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   // useFormでフォームの状態を管理
-  const { register, handleSubmit } = useForm<LoginFormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -83,6 +83,7 @@ export default function AdminLoginPage() {
               placeholder="管理者名"
               className=""
             /><br />
+            {errors.name && <p className="text-red-500 text-sm mt-1">管理者名は必須です</p>}
             <Input
               type="password"
               id="password"
@@ -90,6 +91,7 @@ export default function AdminLoginPage() {
               placeholder="パスワード"
               className=""
             /><br />
+            {errors.name && <p className="text-red-500 text-sm mt-1">管理者名は必須です</p>}
             <FormSubmitButton
               isLoading={isLoading}
               loadingText="ログイン処理中..." // ローディング時のテキストを指定 (省略可)
