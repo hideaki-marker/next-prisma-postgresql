@@ -3,6 +3,9 @@ import { cookies } from 'next/headers'; // App RouterでCookieにアクセスす
 import prisma from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import LogoutButton from '@/components/common/LogoutButton';
+import { TransitionButton } from '@/components/common/TransitionButton';
+import { PiListPlusFill, PiBreadFill } from "react-icons/pi";
+import { GiCook, GiKnifeFork } from "react-icons/gi";
 
 export default async function AdminIndex() {
   let adminName = null;
@@ -78,25 +81,41 @@ export default async function AdminIndex() {
         {adminName ? `${adminName}様いらっしゃいませ` : 'ゲスト様いらっしゃいませ'}
       </p>
       <br />
-      <Link href="/menuMaintenance" className="flex items-center text-4xl justify-center">
-        <p>◆メニューメンテナンス</p>
-      </Link>
+      <TransitionButton 
+        href="/menuMaintenance" // 遷移先を指定
+        variant="outline"      // スタイルを調整
+        className="flex items-center text-4xl justify-center border-none" // 必要に応じてカスタムクラスを追加
+      >
+        <PiBreadFill className="inline mr-2 !h-9 !w-9" />
+        メニューメンテナンス
+      </TransitionButton>
       <br />
-      <Link href="/menuInsert" className="flex items-center text-4xl justify-center">
-        <p>◆メニュー追加</p>
-      </Link>
+      <TransitionButton 
+        href="/menuInsert"
+        variant="outline"
+        className="flex items-center text-4xl justify-center border-none"
+      >
+        <GiCook className="inline mr-2 !h-9 !w-9" />
+        メニュー追加
+      </TransitionButton>
       <br />
-      <Link href="/menuDelete" className="flex items-center text-4xl justify-center">
-        <p>◆メニュー削除</p>
-      </Link>
+      <TransitionButton 
+        href="/courseInsert"
+        variant="outline"
+        className="flex items-center text-4xl justify-center border-none"
+      >
+        <GiKnifeFork className="inline mr-2 !h-9 !w-9" />
+        コース追加
+      </TransitionButton>
       <br />
-      <Link href="/courseInsert" className="flex items-center text-4xl justify-center">
-        <p>◆コース追加</p>
-      </Link>
-      <br />
-      <Link href="/reserveList" className="flex items-center text-4xl justify-center">
-        <p>◆予約情報</p>
-      </Link>
+      <TransitionButton 
+        href="/reserveList"
+        variant="outline"
+        className="flex items-center text-4xl justify-center border-none"
+      >
+        <PiListPlusFill className="inline mr-2 !h-9 !w-9" />
+        予約情報
+      </TransitionButton>
       <br />
       <LogoutButton />
     </div>
