@@ -46,7 +46,7 @@ export const TransitionButton = React.forwardRef<HTMLButtonElement, TransitionBu
         {isLoading ? (
           // ローディング中の表示
           <div className="flex items-center justify-center">
-            <Loader2 className="mr-2 h-8 w-8 animate-spin" />
+            <Loader2 className="mr-2 !h-8 !w-8 animate-spin" />
             {loadingText}
           </div>
         ) : (
