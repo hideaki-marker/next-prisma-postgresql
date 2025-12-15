@@ -74,7 +74,9 @@ export default async function AdminIndex() {
 
   // 4. 認証されたユーザー向けのUIを表示
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4
+                    bg-cover bg-center 
+                    bg-[url('../../public/adminpage.png')]">
       <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">管理者ページ</h1>
       <br />
       <p className="flex items-center text-6xl justify-center mb-16">
