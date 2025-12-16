@@ -37,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${zenKaku.variable}`}>
-      <body className='!pt-16'>
+      <body>
         <Header />
         {children}
         <Toaster richColors position="top-center" />
