@@ -37,27 +37,27 @@ export default function Header() {
               <li>
                 <Link 
                   href="/showMenu" 
-                  className="flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <Utensils className="h-6 w-6 mr-1.5 text-[#006432] group-hover:text-[#D32F2F]" />
+                  <Utensils className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
                   メニュー紹介
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/login" 
-                  className="flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <LogIn className="h-6 w-6 mr-1.5 text-[#006432] group-hover:text-[#D32F2F]" />
+                  <LogIn className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
                   ログイン
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/userInsert" 
-                  className="flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <UserPlus className="h-6 w-6 mr-1.5 text-[#006432] group-hover:text-[#D32F2F]" />
+                  <UserPlus className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
                   新規お客様登録
                 </Link>
               </li>
