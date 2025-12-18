@@ -32,7 +32,7 @@ export default function Header() {
             </Link>
 
             {/* 中央：サイゼリヤ特有の赤いキャッチフレーズ */}
-        <div className="hidden lg:block flex-grow text-center">
+        <div className="hidden lg:flex flex-grow justify-center items-center text-center">
           <p className="text-[#D32F2F] italic font-serif text-xl font-bold tracking-widest">
             La Buona Tavola! <span className="text-sm font-sans ml-2">楽しい食卓</span>
           </p>
@@ -77,8 +77,8 @@ export default function Header() {
                   href="/userInsert" 
                   className="group flex flex-col items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <div className="flex items-center text-lg font-bold">
-                  <UserPlus className="h-5 w-5 mr-1.5" />
+                  <div className="flex items-center text-xl font-bold !text-[#006432] group-hover:!text-[#D32F2F] transition-colors">
+                    <UserPlus className="h-6 w-6 mr-1.5" />
                   <span>新規お客様登録</span>
                 </div>
                 <span className="text-[11px] text-gray-500 font-serif italic mt-0.5 group-hover:!text-[#D32F2F]">
