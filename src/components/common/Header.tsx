@@ -7,6 +7,7 @@ export default function Header() {
     
     <nav className="
       shadow-md border-b border-gray-200 py-6
+      py-18
       /* 背景画像の設定 */
       bg-[url('/headerbg.jpg')] 
       bg-repeat
@@ -23,12 +24,19 @@ export default function Header() {
               <Image 
                 src="/headerlogo.png"          // ★2. 画像のパス (public直下の場合)
                 alt="Restaurant Italy"   // 代替テキスト
-                width={200}              // ★3. 表示したい幅 (px)
+                width={240}              // ★3. 表示したい幅 (px)
                 height={60}              // ★4. 表示したい高さ (px)
                 className="object-contain" // アスペクト比を維持
                 priority                 // LCP対策（ヘッダー画像なので優先読み込み）
               />
             </Link>
+
+            {/* 中央：サイゼリヤ特有の赤いキャッチフレーズ */}
+        <div className="hidden lg:block flex-grow text-center">
+          <p className="text-[#D32F2F] italic font-serif text-xl font-bold tracking-widest">
+            La Buona Tavola! <span className="text-sm font-sans ml-2">楽しい食卓</span>
+          </p>
+        </div>
         
         {/* flex-grow: 中央のスペースを占有 / mx-auto: 中央寄せを補助 */}
         <div className="flex-grow mx-auto flex justify-center">
@@ -37,28 +45,45 @@ export default function Header() {
               <li>
                 <Link 
                   href="/showMenu" 
-                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex flex-col items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <Utensils className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
-                  メニュー紹介
+                  {/* 日本語とアイコンの行 */}
+                <div className="flex items-center text-xl font-bold !text-[#006432] group-hover:!text-[#D32F2F] transition-colors">
+                  <Utensils className="h-6 w-6 mr-1.5" />
+                  <span>メニュー紹介</span>
+                </div>
+                {/* 英語サブテキスト：真下に配置 */}
+                <span className="text-[11px] text-gray-500 font-serif italic mt-0.5 group-hover:!text-[#D32F2F]">
+                  Menu book
+                </span>
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/login" 
-                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex flex-col items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <LogIn className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
-                  ログイン
+                  <div className="flex items-center text-xl font-bold !text-[#006432] group-hover:!text-[#D32F2F] transition-colors">
+                  <LogIn className="h-6 w-6 mr-1.5" />
+                  <span>ログイン</span>
+                </div>
+                <span className="text-[11px] text-gray-500 font-serif italic mt-0.5 group-hover:!text-[#D32F2F]">
+                  Sign in
+                </span>
                 </Link>
               </li>
               <li>
                 <Link 
                   href="/userInsert" 
-                  className="group flex items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
+                  className="group flex flex-col items-center text-lg !text-[#006432] hover:!text-[#D32F2F] whitespace-nowrap"
                 >
-                  <UserPlus className="h-6 w-6 mr-1.5 group-hover:text-[#D32F2F]" />
-                  新規お客様登録
+                  <div className="flex items-center text-lg font-bold">
+                  <UserPlus className="h-5 w-5 mr-1.5" />
+                  <span>新規お客様登録</span>
+                </div>
+                <span className="text-[11px] text-gray-500 font-serif italic mt-0.5 group-hover:!text-[#D32F2F]">
+                  New Registration
+                </span>
                 </Link>
               </li>
             </ul>
