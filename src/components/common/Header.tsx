@@ -5,18 +5,7 @@ import { Utensils, LogIn, UserPlus } from 'lucide-react';
 export default function Header() {
   return (
     
-    <nav className="
-      shadow-md border-b border-gray-200 py-6
-      py-18
-      /* 背景画像の設定 */
-      bg-[url('/headerbg.jpg')] 
-      bg-repeat
-      bg-center
-      /* ↓ 画像の上にクリーム色を重ねて馴染ませる設定 */
-      bg-[#FDFCF0]/90 
-      bg-blend-overlay
-    ">
-      
+    <nav className="shadow-md border-b border-gray-200 py-18 bg-[url('/headerbg.jpg')] bg-repeat bg-center bg-[#FDFCF0]/90 bg-blend-overlay">      
       <div className="container mx-auto flex items-center justify-between h-full">
         
         {/* レストラン名 (左) */}
