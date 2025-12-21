@@ -53,9 +53,9 @@ export default function HomePage() {
                 src={currentSlide.image} 
                 alt={currentSlide.title}
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-opacity duration-700"
-              />
-              <div className="absolute top-6 left-6 bg-[#8B2E2E] text-white rounded-full w-16 h-16 flex flex-col items-center justify-center text-[10px] font-bold border-2 border-white">
+              />              <div className="absolute top-6 left-6 bg-[#8B2E2E] text-white rounded-full w-16 h-16 flex flex-col items-center justify-center text-[10px] font-bold border-2 border-white">
                 <span>Since</span>
                 <span className="text-sm">2025</span>
               </div>
@@ -85,11 +85,11 @@ export default function HomePage() {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
+                aria-label={`スライド ${index + 1}`}
                 className={`w-3 h-3 rounded-full transition-colors ${
                   index === currentIndex ? 'bg-[#D32F2F]' : 'bg-gray-300'
                 }`}
-              />
-            ))}
+              />            ))}
           </div>
         </div>
       </div>
