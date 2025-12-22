@@ -43,9 +43,24 @@ export default function TopSlider() {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % SLIDES.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [isPaused]); // ★[isPaused]を監視対象に入れる
-
+  }, [isPaused, currentIndex]); // ★currentIndexも監視してタイマーをリセット
+  
   const currentSlide = SLIDES[currentIndex];
+
+  // キーボードナビゲーション
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // スライダーにフォーカスがある時や、ページ全体での操作を想定
+    if (e.key === 'ArrowLeft') {
+      setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+    } else if (e.key === 'ArrowRight') {
+      setCurrentIndex((prev) => (prev + 1) % SLIDES.length);
+    }
+  };
+  
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, []); // 空の配列でOK。ブラウザ全体でキー入力を監視します。
 
   return (
     <section className="w-full py-12 flex flex-col items-center">
