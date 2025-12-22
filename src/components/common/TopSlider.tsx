@@ -50,6 +50,11 @@ export default function TopSlider() {
   // キーボードナビゲーション
 useEffect(() => {
   const handleKeyDown = (e: KeyboardEvent) => {
+    // Don't handle if user is in an input field
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return;
+    }
     // スライダーにフォーカスがある時や、ページ全体での操作を想定
     if (e.key === 'ArrowLeft') {
       setCurrentIndex((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
@@ -61,7 +66,6 @@ useEffect(() => {
   window.addEventListener('keydown', handleKeyDown);
   return () => window.removeEventListener('keydown', handleKeyDown);
 }, []); // 空の配列でOK。ブラウザ全体でキー入力を監視します。
-
   return (
     <section className="w-full py-12 flex flex-col items-center">
       <div className="w-full max-w-6xl px-4">
