@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'; // ★2. Reactの機能をインポート
 import Image from 'next/image'; // Imageコンポーネクトをインポート
 import TopSlider from '@/components/common/TopSlider';
+import WineSection from '@/components/common/WineSection';
 
 export default function HomePage() {
 
@@ -16,6 +17,7 @@ export default function HomePage() {
           <TopSlider />
           </div>
       </div>
+      <WineSection />
       {/* トップ画像を表示 */}
       <div className="relative w-full aspect-video"> {/* 画像とH1タイトルの間に余白 */}
         <Image

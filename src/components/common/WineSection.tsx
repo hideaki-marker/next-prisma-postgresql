@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { TbPhotoPlus } from "react-icons/tb";
 
 const WINES = [
@@ -9,7 +10,7 @@ const WINES = [
     description: "天然発酵の低アルコールワイン。\nお肉料理によく合います。",
     bottleprice: "1,100円",
     glassprice: "300円",
-    image: "/file.svg" // 後で画像を生成して配置しましょう！
+    image: "/redwine.png" // 後で画像を生成して配置しましょう！
   },
   {
     id: 2,
@@ -18,13 +19,14 @@ const WINES = [
     description: "フレッシュな果実味と、\n心地よい酸味が特徴です。",
     bottleprice: "1,100円",
     glassprice: "300円",
+    image: "/whitewine.png"
   }
 ];
 
 export default function WineSection() {
   return (
     <section className="bg-[#F8F5F2] py-20 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1440px] mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#4A2C2A] mb-4 font-serif italic">Wine List</h2>
           <div className="w-24 h-1 bg-[#8B5E3C] mx-auto mb-4"></div>
@@ -35,14 +37,14 @@ export default function WineSection() {
           {WINES.map((wine) => (
             <div key={wine.id} className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col sm:flex-row p-4 hover:shadow-2xl transition-all duration-300 border border-[#EBE3D5] group">
               {/* ワインの画像エリア */}
-              <div className="w-full sm:w-1/3 relative h-64 bg-gray-50 rounded-2xl overflow-hidden">
+              <div className="w-full sm:w-[45%] relative h-72 sm:h-auto bg-[#FDFBF9] rounded-[30px] overflow-hidden flex items-center justify-center">
                 {wine.image ? (
                     // 画像がある場合
                     <Image 
                     src={wine.image} 
                     alt={wine.name}
                     fill
-                    className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
+                    className="object-cover p-4 group-hover:scale-110 transition-transform duration-500"
                     />
                 ) : (
                     // 画像がない場合：アイコンを表示
@@ -51,6 +53,7 @@ export default function WineSection() {
                     <span className="text-[10px] uppercase tracking-widest font-bold mt-2">No Image</span>
                     </div>
                 )}
+                <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
               </div>
 
               {/* ワインの情報エリア */}
@@ -77,11 +80,13 @@ export default function WineSection() {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <button className="border-2 border-[#4A2C2A] text-[#4A2C2A] px-10 py-3 rounded-full font-bold hover:bg-[#4A2C2A] hover:text-white transition-all duration-300 shadow-md">
-            すべてのワインを見る
-          </button>
-        </div>
+        <Link href="/wines">
+          <div className="mt-16 text-center">
+            <button className="border-2 border-[#4A2C2A] text-[#4A2C2A] px-10 py-3 rounded-full font-bold hover:bg-[#4A2C2A] hover:text-white transition-all duration-300 shadow-md">
+              すべてのワインを見る
+            </button>
+          </div>
+        </Link>
       </div>
     </section>
   );
