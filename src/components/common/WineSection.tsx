@@ -25,8 +25,8 @@ const WINES = [
 
 export default function WineSection() {
   return (
-    <section className="bg-[#F8F5F2] py-20 px-4">
-      <div className="max-w-[1440px] mx-auto">
+    <section className="bg-[#F8F5F2] py-20 px-4 w-full flex flex-col items-center">
+      <div className="max-w-7xl w-full mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#4A2C2A] mb-4 font-serif italic">Wine List</h2>
           <div className="w-24 h-1 bg-[#8B5E3C] mx-auto mb-4"></div>
@@ -37,7 +37,7 @@ export default function WineSection() {
           {WINES.map((wine) => (
             <div key={wine.id} className="bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col sm:flex-row p-4 hover:shadow-2xl transition-all duration-300 border border-[#EBE3D5] group">
               {/* ワインの画像エリア */}
-              <div className="w-full sm:w-[45%] relative h-72 sm:h-auto bg-[#FDFBF9] rounded-[30px] overflow-hidden flex items-center justify-center">
+              <div className="w-full sm:w-2/5 relative h-72 sm:h-auto bg-[#FDFBF9] rounded-[30px] overflow-hidden flex items-center justify-center">
                 {wine.image ? (
                     // 画像がある場合
                     <Image 
@@ -57,8 +57,7 @@ export default function WineSection() {
               </div>
 
               {/* ワインの情報エリア */}
-              <div className="w-full sm:w-2/3 p-6 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
+              <div className="w-full sm:w-3/5 p-6 flex flex-col">                <div className="flex justify-between items-start mb-2">
                   <span className="text-xs font-bold px-2 py-1 bg-[#FDF2F2] text-[#D32F2F] rounded">
                     {wine.type}
                   </span>
@@ -82,9 +81,9 @@ export default function WineSection() {
 
         <Link href="/wines">
           <div className="mt-16 text-center">
-            <button className="border-2 border-[#4A2C2A] text-[#4A2C2A] px-10 py-3 rounded-full font-bold hover:bg-[#4A2C2A] hover:text-white transition-all duration-300 shadow-md">
-              すべてのワインを見る
-            </button>
+            <span className="inline-block border-2 border-[#4A2C2A] text-[#4A2C2A] px-10 py-3 rounded-full font-bold hover:bg-[#4A2C2A] hover:text-white transition-all duration-300 shadow-md">
+                すべてのワインを見る
+            </span>
           </div>
         </Link>
       </div>
