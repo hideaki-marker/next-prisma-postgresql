@@ -1,11 +1,8 @@
-// app/showMenu/page.tsx (修正後のコード)
-
 import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers'; 
-import MenuOrderControls from '@/components/common/MenuOrderControls'; // クライアントコンポーネントをインポート
+import MenuOrderControls from '@/components/common/MenuOrderControls'; 
 import CourseOrderControls from '@/components/common/CourseOrderControls';
 
-// Prisma Clientのインスタンスを作成
 const prisma = new PrismaClient(); 
 
 export default async function ShowMenuPage() {
@@ -13,93 +10,85 @@ export default async function ShowMenuPage() {
   const authToken = cookieStore.get('auth_token')?.value; 
   const isLoggedIn = !!authToken;
   
-  // データベースからmenuTypeデータを取得（メニューをネストして取得）
-  const menuTypeQueryArgs = {
-    include: {
-      menu: true, 
-    },
-  }; 
-
-  // ★修正なし：menuType変数に分類ごとのメニュー結果を格納
+  // データ取得ロジック（変更なし）
+  const menuTypeQueryArgs = { include: { menu: true } }; 
   const menuType = await prisma.menuType.findMany(menuTypeQueryArgs);
-  // 型定義はそのまま利用
-  // type MenuTypeWithIncludedMenu = typeof menuType[number]; 
   const courseCtlQuery = await prisma.courseCtl.findMany({
-    // ★ リレーション先の course と menu の両方を include する必要があります
     include: {
-        course: true, // course モデルの全フィールドを含める (c_name、priceなどが含まれる)
-        menu: { // menu モデルを含める
-            select: {
-                m_id: true,
-                m_name: true,
-                price: true,
-                detail: true,
-                // menuTypeが必要であればさらにネスト
-                // menuType: { select: { t_name: true } }
-            }
-        },
-    }
-});
+      course: true,
+      menu: { select: { m_id: true, m_name: true, price: true, detail: true } },
+    },
+  });
 
-// このクエリ結果を courseCtl に代入してコンポーネントに渡します
-type GroupedCourse = {
-    c_id: number;
-    c_name: string;
-    price: number;
-    detail: string | null;
-    orderFlg: boolean;
-    // このコースに含まれるメニューのリスト
-    menus: {
-        m_name: string;
-        // 必要に応じて他のメニュー情報も追加
-    }[]; 
-};
+  // コースデータの整形ロジック（変更なし）
+  type GroupedCourse = {
+    c_id: number; c_name: string; price: number; detail: string | null; orderFlg: boolean;
+    menus: { m_name: string }[]; 
+  };
+  type GroupedCourseMap = Record<number, GroupedCourse>;
 
-// 取得した courseCtl の配列をグループ化する
-type GroupedCourseMap = Record<number, GroupedCourse>;
-
-const groupedCourses = courseCtlQuery.reduce<GroupedCourseMap>((acc, currentCtl) => {
-    if (!currentCtl.course || !currentCtl.menu) { 
-        // データが不完全なレコードはスキップする
-        console.warn('Skipping courseCtl record due to missing relation data:', currentCtl);
-        return acc;
-    }
-    // -------------------------------------------------------------
-    
+  const groupedCourses = courseCtlQuery.reduce<GroupedCourseMap>((acc, currentCtl) => {
+    if (!currentCtl.course || !currentCtl.menu) return acc;
     const c_id = currentCtl.course.c_id;
-    
-    // 既存のコースがない場合、新しいコースオブジェクトを作成
     if (!acc[c_id]) {
-        acc[c_id] = {
-            c_id: currentCtl.course.c_id,
-            c_name: currentCtl.course.c_name,
-            price: currentCtl.course.price,
-            detail: currentCtl.course.detail,
-            orderFlg: currentCtl.course.orderFlg,
-            menus: [], // メニューリストはここで初期化
-        };
+      acc[c_id] = { ...currentCtl.course, menus: [] };
     }
-    
-    // 現在のメニューをコースのメニューリストに追加
     acc[c_id].menus.push({ m_name: currentCtl.menu.m_name }); 
-    
     return acc;
-}, {} as GroupedCourseMap);
+  }, {} as GroupedCourseMap);
 
-const finalCourseList = Object.values(groupedCourses);
-  
+  const finalCourseList = Object.values(groupedCourses);
 
   return (
-    // ★★★ max-w-7xl (最大幅) と mx-auto (中央寄せ) を追加 ★★★
-  <div className="w-full flex flex-col items-center">
-      <div className="flex justify-center mb-10">
-        <h1 className="font-bold text-5xl mt-0 mb-0">メニュー一覧</h1>
+    <main className="min-h-screen bg-[#FDFBF9] flex flex-col items-center">
+      {/* --- 1. ラ・パウザ風 ヒーローヘッダー --- */}
+      <div className="relative h-[300px] w-full flex items-center justify-center bg-[#4A2C2A] overflow-hidden">
+        {/* 背景にうっすら料理の雰囲気（後で画像を入れると完璧です） */}
+        <div className="absolute inset-0 opacity-30 bg-[url('/Margherita.png')] bg-cover bg-center"></div>
+        <div className="relative text-center z-10">
+          <h1 className="text-white text-6xl font-serif italic mb-4 tracking-wider">Food Menu</h1>
+          <div className="w-20 h-1 bg-[#D32F2F] mx-auto mb-4"></div>
+          <p className="text-[#EBE3D5] text-lg uppercase tracking-[0.2em]">お品書き</p>
+        </div>
       </div>
 
-      {/* ★修正：分類情報を含んだ menuType をそのまま渡します。 */}
-      <CourseOrderControls courseList={finalCourseList} isLoggedIn={isLoggedIn} />
-      <MenuOrderControls menuTypes={menuType} isLoggedIn={isLoggedIn} />
-      {/* 固定表示やReturnButtonは、MenuOrderControls内に統合することを推奨します。 */}
-    </div>
+      {/* --- 2. メインコンテンツエリア --- */}
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        
+        {/* 特別コースセクション（ラ・パウザの「おすすめ」枠のイメージ） */}
+        {finalCourseList.length > 0 && (
+          <section className="mb-20">
+            <div className="flex items-center gap-4 mb-10">
+              <h2 className="text-3xl font-bold text-[#4A2C2A]">Course Menu</h2>
+              <span className="text-[#8B5E3C] text-sm font-medium">コース料理</span>
+              <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
+            </div>
+            <CourseOrderControls courseList={finalCourseList} isLoggedIn={isLoggedIn} />
+          </section>
+        )}
+
+        {/* グランドメニューセクション */}
+        <section className="w-full flex flex-col items-center">
+          {/* ★ max-w を 4xl (または 5xl) 程度に固定し、mx-auto で中央固定 */}
+          <div className="w-full max-w-4xl flex items-center gap-4 mb-12 mx-auto px-4">
+            <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
+            <h2 className="text-3xl font-bold text-[#4A2C2A] whitespace-nowrap">Grand Menu</h2>
+            <span className="text-[#8B5E3C] text-sm font-medium">アラカルト</span>
+            <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
+          </div>
+          
+          {/* MenuOrderControls 内部でカテゴリー（menuType）ごとのループとカード描画を行う */}
+          <MenuOrderControls menuTypes={menuType} isLoggedIn={isLoggedIn} />
+        </section>
+
+      </div>
+
+      {/* 戻るボタン等のフッター要素（お好みで） */}
+      <div className="pb-20 flex justify-center">
+        <button className="text-gray-400 hover:text-[#4A2C2A] transition-colors flex items-center gap-2">
+          <span>↑</span> Page Top
+        </button>
+      </div>
+    </main>
   );
 }
