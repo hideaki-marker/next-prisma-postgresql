@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers'; 
+import OrderManager from '@/components/common/OrderManager';
 import MenuOrderControls from '@/components/common/MenuOrderControls'; 
 import CourseOrderControls from '@/components/common/CourseOrderControls';
 
@@ -54,33 +55,11 @@ export default async function ShowMenuPage() {
 
       {/* --- 2. メインコンテンツエリア --- */}
       <div className="max-w-7xl mx-auto px-4 py-16">
-        
-        {/* 特別コースセクション（ラ・パウザの「おすすめ」枠のイメージ） */}
-        {finalCourseList.length > 0 && (
-          <section className="mb-20">
-            <div className="flex items-center gap-4 mb-10">
-              <h2 className="text-3xl font-bold text-[#4A2C2A]">Course Menu</h2>
-              <span className="text-[#8B5E3C] text-sm font-medium">コース料理</span>
-              <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
-            </div>
-            <CourseOrderControls courseList={finalCourseList} isLoggedIn={isLoggedIn} />
-          </section>
-        )}
-
-        {/* グランドメニューセクション */}
-        <section className="w-full flex flex-col items-center">
-          {/* ★ max-w を 4xl (または 5xl) 程度に固定し、mx-auto で中央固定 */}
-          <div className="w-full max-w-4xl flex items-center gap-4 mb-12 mx-auto px-4">
-            <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
-            <h2 className="text-3xl font-bold text-[#4A2C2A] whitespace-nowrap">Grand Menu</h2>
-            <span className="text-[#8B5E3C] text-sm font-medium">アラカルト</span>
-            <div className="flex-grow h-[1px] bg-[#EBE3D5]"></div>
-          </div>
-          
-          {/* MenuOrderControls 内部でカテゴリー（menuType）ごとのループとカード描画を行う */}
-          <MenuOrderControls menuTypes={menuType} isLoggedIn={isLoggedIn} />
-        </section>
-
+        <OrderManager 
+          menuType={menuType} 
+          finalCourseList={finalCourseList} 
+          isLoggedIn={isLoggedIn} 
+        />
       </div>
 
       {/* 戻るボタン等のフッター要素（お好みで） */}
