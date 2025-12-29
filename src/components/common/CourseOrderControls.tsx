@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ShoppingCart, LogIn } from 'lucide-react';
 
 type GroupedCourse = {
     c_id: number;
@@ -84,6 +85,43 @@ export default function CourseOrderControls({ courseList, isLoggedIn }: { course
                 </div>
             ))}
             </div>
-        </div>
-    );
+
+            {/* --- 1. フッター固定注文バー（ここがグランドメニューと同じロジック） --- */}
+      <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#EBE3D5] transition-all duration-300 z-50 flex justify-center items-center gap-4 ${hasOrder ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+        <p className="hidden sm:block text-[#4A2C2A] font-medium italic">
+          Selected Course items...
+        </p>
+
+        {isLoggedIn ? (
+          <Button
+            size="lg"
+            onClick={handleReserve} 
+            className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2 transform active:scale-95 transition-transform"
+          >
+            <ShoppingCart size={18} />
+            <span>コースを確定して予約へ</span>
+          </Button>
+        ) : (
+          <Link href="/login">
+            <Button
+              size="lg"
+              className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
+            >
+              <LogIn size={18} />
+              <span>ログインして予約へ</span>
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {/* --- 2. ページ下部の注意書きエリア --- */}
+      <div className="mt-12 mb-10 flex flex-col items-center gap-4">
+        {!isLoggedIn && hasOrder && (
+          <p className="text-[#D32F2F] font-medium text-sm bg-red-50 px-4 py-2 rounded-full">
+            ※ 予約を確定するにはログインが必要です
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
