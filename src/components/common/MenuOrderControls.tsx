@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Plus, Minus, ShoppingCart } from 'lucide-react'; // アイコンを追加
+import { Plus, Minus, ShoppingCart, LogIn } from 'lucide-react'; // アイコンを追加
 import ReturnButton from './ReturnButton';
 
 // 型定義（変更なし）
@@ -28,6 +28,8 @@ const MENU_IMAGE_MAP: Record<number, string> = {
   2: "SautéedWhiteFish.png",
   3: "hamsalad.png",
   4: "StrawberryParfait.png",
+  5: "Napolitan.png",
+  6: "Carbonara.png",
   // IDが増えたらここに追加するだけ！
 };
 
@@ -90,11 +92,9 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        // 画像がない場合のフォールバック（透明な画像やプレースホルダー）
                         const target = e.target as HTMLImageElement;
-                        target.src = "https://placehold.jp/24/8b5e3c/ffffff/200x200.png?text=No%20Image";
-                      }}
-                    />
+                        target.src = "/file.svg";
+                      }}                    />
                   </div>
 
                   {/* 右側：コンテンツ */}
@@ -120,6 +120,7 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
                           onClick={() => handleQuantityChange(menuItem.m_id, -1)}
                           disabled={!quantities[menuItem.m_id]}
                           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white disabled:opacity-30 transition-colors"
+                          aria-label={`${menuItem.m_name}の数量を減らす`}
                         >
                           <Minus size={14} className="text-[#4A2C2A]" />
                         </button>
@@ -129,6 +130,7 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
                         <button 
                           onClick={() => handleQuantityChange(menuItem.m_id, 1)}
                           className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white transition-colors"
+                          aria-label={`${menuItem.m_name}の数量を増やす`}
                         >
                           <Plus size={14} className="text-[#4A2C2A]" />
                         </button>
@@ -138,53 +140,54 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-500 col-span-2 py-10">準備中です...</p>
+              <p className="text-center text-gray-500 col-span-2 py-10">🍽️準備中です...</p>
             )}
           </div>
         </div>
       ))}
 
-      {/* フッター固定注文バー（モバイル対応） */}
-      <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-[#EBE3D5] transition-transform duration-300 z-50 flex justify-center items-center gap-4 ${hasOrder ? 'translate-y-0' : 'translate-y-full'}`}>
-        <p className="hidden sm:block text-[#4A2C2A] font-medium">
-          メニューが選択されています
+      {/* 1. フッター固定注文バー（hasOrderがtrueの時だけ出現） */}
+      <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#EBE3D5] transition-all duration-300 z-50 flex justify-center items-center gap-4 ${hasOrder ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+        <p className="hidden sm:block text-[#4A2C2A] font-medium italic">
+          Selected Menu items...
         </p>
-        <Button
-          size="lg"
-          onClick={handleReserve} 
-          className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
-        >
-          <ShoppingCart size={18} />
-          <span>注文を確定して予約へ</span>
-        </Button>
-      </div>
 
-      <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-        {/* ログインと注文の両方を満たす場合のみ予約ボタンを表示 */}
         {isLoggedIn ? (
+          /* ログイン済み：予約へ進むボタン */
           <Button
             size="lg"
             onClick={handleReserve} 
-            disabled={!hasOrder} 
-            className="bg-black hover:bg-gray-800 text-white text-lg py-4"
+            className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2 transform active:scale-95 transition-transform"
           >
-            メニューを確定し、予約へ進む
+            <ShoppingCart size={18} />
+            <span>注文を確定して予約へ</span>
           </Button>
         ) : (
-          <div className="space-y-4">
-            <p className="text-lg text-red-500 font-semibold">
-              メニューを注文して予約に進むには、ログインが必要です。
-            </p>
-            <Link href="/login" passHref>
-              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white text-lg py-4">
-                ログインして予約へ
-              </Button>
-            </Link>
-          </div>
+          /* 未ログイン：ログインを促すボタン */
+          <Link href="/login">
+            <Button
+              size="lg"
+              className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
+            >
+              <LogIn size={18} />
+              <span>ログインして予約へ</span>
+            </Button>
+          </Link>
         )}
-        <ReturnButton 
-            isLoggedIn={isLoggedIn}
-          />
+      </div>
+
+      {/* 2. ページ最下部のエリア（ボタンを削除し、戻るボタンだけに整理） */}
+      <div className="mt-20 pb-10 flex flex-col items-center gap-6">
+        {/* 以前ここに置いていた重複する予約ボタンは削除！ */}
+        
+        {/* ログインしていない場合の注意書き（任意） */}
+        {!isLoggedIn && hasOrder && (
+          <p className="text-[#D32F2F] font-medium text-sm">
+            ※ 予約を確定するにはログインが必要です
+          </p>
+        )}
+
+        <ReturnButton isLoggedIn={isLoggedIn} />
       </div>
     </div>
   );
