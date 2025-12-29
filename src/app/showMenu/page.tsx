@@ -1,10 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers'; 
-import OrderManager from '@/components/common/OrderManager';
-import MenuOrderControls from '@/components/common/MenuOrderControls'; 
-import CourseOrderControls from '@/components/common/CourseOrderControls';
-
-const prisma = new PrismaClient(); 
+import OrderManager from '@/components/common/OrderManager';const prisma = new PrismaClient(); 
 
 export default async function ShowMenuPage() {
   const cookieStore = await cookies();
