@@ -1,16 +1,15 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers'; 
 import MenuOrderControls from '@/components/common/MenuOrderControls'; 
 import CourseOrderControls from '@/components/common/CourseOrderControls';
-
-const prisma = new PrismaClient(); 
+import PageTopButton from '@/components/common/PageTopButton';
 
 export default async function ShowMenuPage() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth_token')?.value; 
   const isLoggedIn = !!authToken;
   
-  // データ取得ロジック（変更なし）
+  // データ取得ロジック
   const menuTypeQueryArgs = { include: { menu: true } }; 
   const menuType = await prisma.menuType.findMany(menuTypeQueryArgs);
   const courseCtlQuery = await prisma.courseCtl.findMany({
@@ -20,7 +19,7 @@ export default async function ShowMenuPage() {
     },
   });
 
-  // コースデータの整形ロジック（変更なし）
+  // コースデータの整形ロジック
   type GroupedCourse = {
     c_id: number; c_name: string; price: number; detail: string | null; orderFlg: boolean;
     menus: { m_name: string }[]; 
@@ -84,11 +83,7 @@ export default async function ShowMenuPage() {
       </div>
 
       {/* 戻るボタン等のフッター要素（お好みで） */}
-      <div className="pb-20 flex justify-center">
-        <button className="text-gray-400 hover:text-[#4A2C2A] transition-colors flex items-center gap-2">
-          <span>↑</span> Page Top
-        </button>
-      </div>
+      <PageTopButton />
     </main>
   );
 }
