@@ -61,7 +61,7 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
   const hasOrder = Object.values(quantities).some(q => q > 0);
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center pb-28">
       {menuTypes.map(type => (
         <div key={type.t_id} className="w-full mb-16 flex flex-col items-center">
           {/* カテゴリー見出し：ラ・パウザ風に中央寄せ＋装飾 */}
@@ -90,6 +90,7 @@ export default function MenuOrderControls({ menuTypes, isLoggedIn }: { menuTypes
                           }
                       alt={menuItem.m_name}
                       fill
+                      sizes="(max-width: 768px) 40vw, 20vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
