@@ -2,7 +2,14 @@ import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers'; 
 import OrderManager from '@/components/common/OrderManager';
 
-const prisma = new PrismaClient();
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
 export default async function ShowMenuPage() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth_token')?.value; 
