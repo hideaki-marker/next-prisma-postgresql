@@ -33,7 +33,7 @@ export default function OrderManager({ menuType, finalCourseList, isLoggedIn }: 
   return (
     <>
       {/* コースセクション */}
-      {finalCourseList.length > 0 && (
+      {finalCourseList && Array.isArray(finalCourseList) && finalCourseList.length > 0 && (
         <section className="mb-20">
           <div className="flex items-center gap-4 mb-10">
             <h2 className="text-3xl font-bold text-[#4A2C2A]">Course Menu</h2>
@@ -46,7 +46,6 @@ export default function OrderManager({ menuType, finalCourseList, isLoggedIn }: 
                       setOrders={setOrders} isLoggedIn={isLoggedIn}/>
         </section>
       )}
-
       {/* グランドメニューセクション */}
       <section className="w-full flex flex-col items-center">
         <div className="w-full max-w-4xl flex items-center gap-4 mb-12 mx-auto px-4">
