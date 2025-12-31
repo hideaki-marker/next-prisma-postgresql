@@ -25,7 +25,6 @@ interface CourseOrderProps {
 
 export default function CourseOrderControls({ 
   courseList, 
-  isLoggedIn, 
   orders, 
   setOrders 
 }: CourseOrderProps) {
