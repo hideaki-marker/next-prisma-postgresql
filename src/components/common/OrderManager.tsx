@@ -23,12 +23,29 @@ export default function OrderManager({ menuType, finalCourseList, isLoggedIn }: 
       .filter(([, quantity]) => quantity > 0)
       .map(([key, quantity]) => {
         const [type, id] = key.split('-');
-        return { id: parseInt(id), type, quantity };
-      });
+        const parsedId = parseInt(id, 10);
+
+        // 数値化に失敗（NaN）した場合は null を返して除外対象にする
+      if (isNaN(parsedId)) {
+        console.error(`Invalid order key format: ${key}`);
+        return null;
+      }
+      return { id: parsedId, type, quantity };
+      })
+      // null（不正なデータ）を排除
+      .filter(item => item !== null);
     
+      // 保存と遷移を try-catch で囲む
+    try {
     localStorage.setItem('temp_reservation_order', JSON.stringify(orderData));
     router.push('/reserve');
-  };
+  } catch (error) {
+    console.error('Failed to save order to localStorage:', error);
+    // Consider showing user feedback here
+    // ユーザーへの通知（お好みで alert など）
+    alert('注文情報の保存に失敗しました。ブラウザの設定（プライベートモード等）を確認してください。');
+  }
+ };
 
   return (
     <>
