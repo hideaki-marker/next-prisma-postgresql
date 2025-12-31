@@ -79,7 +79,7 @@ export default function OrderManager({ menuType, finalCourseList, isLoggedIn }: 
 
       {/* 統合注文バー（ここに1つだけ配置！） */}
       <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-[#EBE3D5] transition-all duration-300 z-50 flex justify-center items-center gap-4 ${hasOrder ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-        <p className="hidden sm:block text-[#4A2C2A] font-medium italic">Selected items in your cart...</p>
+        <p className="hidden sm:block text-[#4A2C2A] font-medium italic">メニューが選択されました</p>
         {isLoggedIn ? (
           <Button size="lg" onClick={handleReserve} className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2">
             <ShoppingCart size={18} />
