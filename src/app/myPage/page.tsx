@@ -1,8 +1,11 @@
-import Link from 'next/link';
 import { cookies } from 'next/headers'; // App RouterでCookieにアクセスするためのヘルパー
 import prisma from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import LogoutButton from '@/components/common/LogoutButton';
+import { TransitionButton } from '@/components/common/TransitionButton';
+import { PiDevicesDuotone } from "react-icons/pi";
+import { MdGroupAdd } from "react-icons/md";
+
 
 export default async function MyPagePage() {
   
@@ -70,7 +73,7 @@ export default async function MyPagePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[url('/guestpage.png')] bg-cover bg-center bg-no-repeat">
       <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">Restaurant italy</h1>
       <br />
       <p className="flex items-center justify-center mb-8">ようこそ！レストランイタリィへ</p>
@@ -79,15 +82,31 @@ export default async function MyPagePage() {
       /* userName が存在する場合のみ表示 */}
         {userName ? `${userName}様いらっしゃいませ` : 'ゲスト様いらっしゃいませ'}</p>
       <br />
-      <Link href="/showMenu" className="flex items-center text-4xl justify-center">
+      <TransitionButton 
+        href="/showMenu" // 遷移先を指定
+        variant="outline"      // スタイルを調整
+        className="flex items-center text-4xl justify-center" // 必要に応じてカスタムクラスを追加
+      >
       <p>◆メニュー紹介</p>
-      </Link>
+      </TransitionButton>
       <br />
-      <Link href="/reserveList" className="flex items-center text-4xl justify-center">
-      <p className="flex items-center text-4xl justify-center">◆ご予約一覧</p>
-      </Link>
+       <TransitionButton 
+        href="/reserveList" 
+        variant="outline"
+        className="flex items-center text-4xl justify-center" // 必要に応じてカスタムクラスを追加
+      >
+      <PiDevicesDuotone className="inline mr-2 !h-9 !w-9"/>
+        ご予約一覧
+      </TransitionButton>
       <br />
-      <p className="flex items-center text-4xl justify-center mb-16">◆新規お客様登録</p>
+      <TransitionButton 
+        href="/userInsert" 
+        variant="outline"
+        className="flex items-center text-4xl justify-center" // 必要に応じてカスタムクラスを追加
+      >
+      <MdGroupAdd className="inline mr-2 !h-9 !w-9"/>
+          友だち追加
+      </TransitionButton>
       <br />
       <LogoutButton />
     </div>
