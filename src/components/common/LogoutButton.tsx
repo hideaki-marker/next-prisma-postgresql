@@ -36,9 +36,10 @@ export default function LogoutButton({ className }: LogoutButtonProps) {
     } catch (error) {
       toast.error('ネットワークエラーが発生しました');
       console.error('ログアウト中にエラーが発生しました:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
   return (
     <Button 
       onClick={handleLogout}
