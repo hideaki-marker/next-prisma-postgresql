@@ -102,7 +102,7 @@ export default async function MyPagePage() {
         <TransitionButton 
           href="/showMenu" // 遷移先を指定
           variant="ghost"      // スタイルを調整
-          className="flex items-center text-3xl justify-center w-full max-w-xs py-6
+          className="flex items-center text-3xl justify-center w-full max-w-xs py-6 group
              text-[#F3E5AB] border border-[#F3E5AB]/30 rounded-full transition-all duration-300
              hover:bg-white/10
              hover:border-[#F3E5AB]
@@ -119,7 +119,7 @@ export default async function MyPagePage() {
         <TransitionButton 
           href="/reserveList" 
           variant="ghost"
-          className="flex items-center text-3xl justify-center w-full max-w-xs py-6
+          className="flex items-center text-3xl justify-center w-full max-w-xs py-6 group
              text-[#F3E5AB] border border-[#F3E5AB]/30 rounded-full transition-all duration-300
              hover:bg-white/10
              hover:border-[#F3E5AB]
@@ -135,7 +135,7 @@ export default async function MyPagePage() {
         <TransitionButton 
           href="/userInsert" 
           variant="ghost"
-          className="flex items-center text-3xl justify-center w-full max-w-xs py-6
+          className="flex items-center text-3xl justify-center w-full max-w-xs py-6 group
              text-[#F3E5AB] border border-[#F3E5AB]/30 rounded-full transition-all duration-300
              hover:bg-white/10
              hover:border-[#F3E5AB]
