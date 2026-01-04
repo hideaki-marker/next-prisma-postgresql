@@ -148,7 +148,25 @@ export default async function MyPagePage() {
             友だち追加
         </TransitionButton>
         <br />
-        <LogoutButton />
+        <LogoutButton 
+          className="
+            text-[#F3E5AB]
+            border border-[#F3E5AB]/30
+            mt-16 
+            bg-transparent 
+            border border-[#F3E5AB]/30
+            hover:bg-white/10
+            hover:border-[#F3E5AB]
+            hover:text-[#E5E7EB]
+            hover:shadow-[0_0_15px_rgba(243,229,171,0.3)]
+            hover:scale-[1.02] 
+            active:scale-[0.98]
+            transition-all 
+            duration-300 
+            rounded-full
+            text-xl
+            !py-4"
+          />
         </div>
       </div>
     </div>
