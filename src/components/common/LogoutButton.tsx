@@ -5,8 +5,13 @@ import { Button } from '@/components/ui/button'; // shadcn/uiのButtonコンポ�
 import { toast } from 'sonner';
 import { useState } from 'react'; // ★1. useStateをインポート
 import { Loader2 } from 'lucide-react'; // ★2. Loader2アイコンをインポート
+import { cn } from "@/lib/utils"; // shadcnのユーティリティ
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  className?: string; // classNameを受け取れるように定義
+}
+
+export default function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false); // ★3. ローディング状態を追加
 
@@ -31,15 +36,20 @@ export default function LogoutButton() {
     } catch (error) {
       toast.error('ネットワークエラーが発生しました');
       console.error('ログアウト中にエラーが発生しました:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
   return (
     <Button 
       onClick={handleLogout}
       variant="outline" 
       disabled={isLoading} // ★7. ローディング中はボタンを無効化
-      className="bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6 relative" // relativeを追加
+      // cn() を使うことで、デフォルトスタイルと引数の className をマージします
+      className={cn(
+        "bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6 relative cursor-pointer", 
+        className
+      )}
     >
       <div className="flex items-center justify-center">
         {/* ★8. ローディング中はスピナーを表示し、テキストを見えなくする★ */}

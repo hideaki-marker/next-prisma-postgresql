@@ -39,7 +39,7 @@ export const TransitionButton = React.forwardRef<HTMLButtonElement, TransitionBu
         type="button" // フォーム送信ではないので type="button"
         disabled={isLoading} // ローディング中は無効化
         // 共通のスタイルと外部からのクラスを結合
-        className={cn(className)} 
+        className={cn("cursor-pointer", className)} 
         onClick={handleClick} // クリックハンドラを適用
         {...props} 
       >
