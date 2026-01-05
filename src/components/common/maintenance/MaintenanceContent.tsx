@@ -235,7 +235,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                             </DialogTrigger>
 
                             {/* 2. モーダルの内容を定義する！ */}
-                            <DialogContent className="sm:max-w-[425px] max-w-2xl">
+                            <DialogContent className="sm:max-w-[425px] max-w-2xl" aria-label="メニュー編集フォーム">
                                 {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
                                 {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
                                 <MenuUpdateForm key={menu.m_id} menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
