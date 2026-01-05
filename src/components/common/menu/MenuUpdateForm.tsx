@@ -1,4 +1,4 @@
-"use client"; // Client Component として動作させるために必要
+"use client";
 
 import { useForm } from "react-hook-form";
 import {
@@ -54,7 +54,6 @@ const formSchema = z.object({
 // メニューデータの型定義（APIから取得するデータ構造に合わせる）
 // Prismaの生成型を使用することもできますが、ここではZodスキーマを元に定義します
 type MenuData = z.infer<typeof formSchema>;
-
 
 // ----------------------------------------------------
 // ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
@@ -162,34 +161,21 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
           {/* ページのヘッダー部分 */}
           <CardHeader className="border-b">
             <div className="flex items-center justify-between">
-              {/* 戻るリンクを Button でスタイリッシュに */}
-              <Link href="/adminIndex" passHref>
-                <Button variant="ghost" size="sm" className="space-x-1">
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>管理者ページへ</span>
-                </Button>
-              </Link>
-              
               {/* タイトル */}
               <CardTitle className="text-3xl font-bold tracking-tight flex-1 text-center pr-12">
                 メニューの更新
               </CardTitle>
             </div>
           </CardHeader>
-
           <CardContent className="pt-6">
-            
             {/* メニューID表示（強調） */}
             <div className="text-center mb-6 p-3 bg-gray-50 border rounded-lg">
               <p className="text-sm text-gray-500">更新対象メニューID:</p>
               <p className="font-extrabold text-2xl text-blue-600">{menuData.m_id}</p>
             </div>
-
             {/* MenuFormFields 本体 */}
             <MenuFormFields control={form.control} menuTypeOptions={menuTypeOptions} />
-
           </CardContent>
-
           <CardFooter className="pt-6 border-t flex justify-center">
             {/* 更新ボタンを shadcn の Button に変更 */}
             <Button 
