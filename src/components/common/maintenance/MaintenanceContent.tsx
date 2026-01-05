@@ -235,21 +235,12 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                             </DialogTrigger>
 
                             {/* 2. モーダルの内容を定義する！ */}
-                            <DialogContent className="sm:max-w-[425px] max-w-2xl"> 
-                                <DialogHeader>
-                                <DialogTitle>メニュー編集: {menu.m_name}</DialogTitle>
-                                <DialogDescription>
-                                    メニュー情報を編集して「保存」をクリックしてください。
-                                </DialogDescription>
-                                </DialogHeader>
-
+                            <DialogContent className="sm:max-w-[425px] max-w-2xl">
                                 {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
                                 {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
                                 <MenuUpdateForm key={menu.m_id} menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
-                                
                                 {/* 編集フォームのコンポーネントを作るときは、
                                 フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
-
                             </DialogContent>
                             </Dialog>
                             <Button size="sm" variant="destructive" onClick={() => handleDelete('menu', menu.m_id)}>削除</Button>
