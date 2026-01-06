@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"; // 編集・削除ボタン用
 import { Dialog,DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 import MenuUpdateForm from '../menu/MenuUpdateForm';
+import { Loader2 } from 'lucide-react'; 
 
 // サーバーアクションから型をインポート
 import { 
@@ -35,10 +36,14 @@ type ContentState = {
     loading: boolean;
 };
 
+/**
+ * メニュー編集画面のメニュー表示部コンポーネント
+ * @param param0 
+ * @returns 
+ */
 export default function MaintenanceContent({ menuTypeOptions }: MaintenanceContentProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
-    
     // URLからクエリを取得
     const queryType = searchParams?.get('type'); // 'course' or 'menuType'
     const queryId = searchParams?.get('id');     // ID (string)
@@ -50,7 +55,6 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
         data: null,
         loading: false,
     });
-
 
     // クエリパラメータの変更を監視し、データを取得する
     useEffect(() => {
@@ -105,7 +109,6 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
         fetchData();
     }, [queryType, queryId]);
 
-
     // -------------------------------------------------------------
     // ★★★★ 削除処理 (プレースホルダー) ★★★★
     // -------------------------------------------------------------
@@ -120,14 +123,16 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
 
     // 1. ロード中
     if (content.loading) {
-        return <div className="text-center py-10 text-xl text-indigo-500">データを読み込み中...</div>;
+        return <div className="text-center py-10 text-xl text-indigo-500 flex items-center justify-center">
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        <span>データを読み込み中...</span>
+                </div>;
     }
     
     // 2. 初期状態
     if (content.type === null) {
         return <div className="text-center py-20 text-gray-500 text-lg">{content.title}</div>;
     }
-
 
     return (
         <div className="space-y-8">
@@ -151,7 +156,6 @@ export default function MaintenanceContent({ menuTypeOptions }: MaintenanceConte
         </div>
     );
 }
-
 
 // コース詳細表示コンポーネント (補助)
 const CourseDisplay = ({ course, handleDelete, router }: 
@@ -220,7 +224,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                     <tr key={menu.m_id} className="hover:bg-gray-50">
                         <td className="py-2 px-4 border-b text-center">{menu.m_id}</td>
                         <td className="py-2 px-4 border-b">{menu.m_name}</td>
-                        <td className="py-2 px-4 border-b text-right">¥{menu.price.toLocaleString()}</td>
+                        <td className="py-2 px-4 border-b text-center">¥{menu.price.toLocaleString()}</td>
                         <td className="py-2 px-4 border-b text-center">{menu.orderFlg ? '✅' : '❌'}</td>
                         <td className="py-2 px-4 border-b text-center space-x-2">
                             <Dialog 
@@ -230,12 +234,15 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                             {/* 1. 編集ボタンをトリガーにする！ */}
                             <DialogTrigger asChild>
                                 <Button size="sm" variant="outline">
-                                編集
+                                    編集
                                 </Button>
                             </DialogTrigger>
-
                             {/* 2. モーダルの内容を定義する！ */}
-                            <DialogContent className="sm:max-w-[425px] max-w-2xl" aria-label="メニュー編集フォーム">
+                            <DialogContent className="sm:max-w-[425px] max-w-2xl !pt-0 gap-0 overflow-hidden border-none [&>button]:text-white [&>button]:opacity-100">
+                                <DialogHeader>
+                                    {/* 見た目には 0.1ミリも影響しませんが、エラーはすべて消えます */}
+                                    <DialogTitle className="sr-only">メニュー編集</DialogTitle>
+                                </DialogHeader>
                                 {/* 3. ここに編集フォーム（MenuUpdateFormコンポーネントなど）を入れる！ */}
                                 {/* ページ遷移で使っていたフォームの中身を、ここに移植するイメージだよ */}
                                 <MenuUpdateForm key={menu.m_id} menuData={menu} menuTypeOptions={menuTypeOptions} onClose={() => handleCloseModal(menu.m_id)} /> 
