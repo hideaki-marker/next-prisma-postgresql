@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"; // 編集・削除ボタン用
-import { Dialog,DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog,DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 import MenuUpdateForm from '../menu/MenuUpdateForm';
 import { Loader2 } from 'lucide-react'; 
@@ -167,8 +167,8 @@ const CourseDisplay = ({ course, handleDelete, router }:
         <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-semibold">{course.c_name}</h3>
             <div className="space-x-2">
-                <Button variant="outline" onClick={() => router.push(`/courseUpdate/${course.c_id}`)} className="text-sm">編集</Button>
-                <Button variant="destructive" onClick={() => handleDelete('course', course.c_id)} className="text-sm">削除</Button>
+                <Button size="lg" variant="outline" onClick={() => router.push(`/courseUpdate/${course.c_id}`)} className="bg-cyan-500 text-white">編集</Button>
+                <Button size="lg" variant="destructive" onClick={() => handleDelete('course', course.c_id)} className="text-sm">削除</Button>
             </div>
         </div>
         <p className="mb-2">価格: ¥{course.price.toLocaleString()}</p>
@@ -182,7 +182,6 @@ const CourseDisplay = ({ course, handleDelete, router }:
         </ul>
     </div>
 );
-
 
 // メニュー一覧テーブル表示コンポーネント (補助)
 const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }: 
@@ -233,7 +232,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                             >
                             {/* 1. 編集ボタンをトリガーにする！ */}
                             <DialogTrigger asChild>
-                                <Button size="sm" variant="outline">
+                                <Button size="lg" variant="outline" className="bg-cyan-500 text-white">
                                     編集
                                 </Button>
                             </DialogTrigger>
@@ -250,12 +249,14 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                                 フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
                             </DialogContent>
                             </Dialog>
-                            <Button size="sm" variant="destructive" onClick={() => handleDelete('menu', menu.m_id)}>削除</Button>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-    )
+                                <Button size="lg" variant="destructive" onClick={() => handleDelete('menu', menu.m_id)}>
+                                    削除
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+        )
     };
