@@ -33,6 +33,11 @@ interface MenuFormFieldsProps {
   menuTypeOptions: string[];
 }
 
+/**
+ * メニュー編集モーダルのメニュー編集部
+ * @param param0 
+ * @returns 
+ */
 export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps) {
   return (
     <>
@@ -42,6 +47,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
         name="menuName"
         render={({ field }) => (
           <FormItem className="flex flex-col items-center">
+            <br />
             <FormLabel>メニュー名</FormLabel>
             <FormControl className="w-full flex justify-center">
               <Input type="text" placeholder="名前" {...field} className="w-2/3 mx-auto" />
@@ -51,7 +57,6 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
         )}
       />
       <br />
-
       {/* 価格フィールド */}
       <FormField
         control={control}
