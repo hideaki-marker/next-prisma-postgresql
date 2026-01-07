@@ -35,7 +35,7 @@ interface MenuFormFieldsProps {
 
 /**
  * メニュー編集モーダル内の入力フォーム項目コンポーネント
- * * @param {MenuFormFieldsProps} props - コンポーネントに渡されるプロパティ
+ *  @param {MenuFormFieldsProps} props - コンポーネントに渡されるプロパティ
  * @param {Control<MenuFormData>} props.control - React Hook Form の制御オブジェクト
  * @param {string[]} props.menuTypeOptions - 選択可能なカテゴリー（メニュータイプ）のリスト
  * @returns {JSX.Element} メニュー編集用の入力フィールド群
