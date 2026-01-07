@@ -215,7 +215,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                     <th className="py-2 px-4 border-b text-left">メニュー名</th>
                     <th className="py-2 px-4 border-b">価格</th>
                     <th className="py-2 px-4 border-b">オーダー可</th>
-                    <th className="py-2 px-4 border-b">操作</th>
+                    <th className="py-2 px-4 border-b">変更項目</th>
                 </tr>
             </thead>
             <tbody>
