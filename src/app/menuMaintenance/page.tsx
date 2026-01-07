@@ -26,7 +26,6 @@ async function getMasterData() {
     return { allCourses, allMenuTypes };
 }
 
-
 export default async function MenuMaintenancePage() {
     // サーバーサイドでデータ取得
     const { allCourses, allMenuTypes, allMenus } = await getMasterData(); // ★ 全メニューデータも取得するはず！
@@ -35,7 +34,7 @@ export default async function MenuMaintenancePage() {
         <div className="flex min-h-screen">
             {/* 1. サイドバーエリア */}
             <div className="w-64 bg-gray-50 border-r p-4 sticky top-0 h-screen overflow-y-auto">
-                <h1 className="text-2xl font-bold mb-6">管理者メニュー</h1>
+                <h1 className="text-2xl font-bold mb-6">メニュー編集</h1>
                 {/* Sidebarコンポーネントにマスターデータを渡す */}
                 <Sidebar 
                     allCourses={allCourses} 
