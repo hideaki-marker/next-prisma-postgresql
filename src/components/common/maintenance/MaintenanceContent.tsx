@@ -209,7 +209,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
     return (
     <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
-            <thead className="bg-gray-100">
+            <thead className="bg-black text-white">
                 <tr>
                     <th className="py-2 px-4 border-b">ID</th>
                     <th className="py-2 px-4 border-b text-left">メニュー名</th>
@@ -220,7 +220,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
             </thead>
             <tbody>
                 {menus.map(menu => (
-                    <tr key={menu.m_id} className="hover:bg-gray-50">
+                    <tr key={menu.m_id} className="hover:bg-gray-100">
                         <td className="py-2 px-4 border-b text-center">{menu.m_id}</td>
                         <td className="py-2 px-4 border-b">{menu.m_name}</td>
                         <td className="py-2 px-4 border-b text-center">¥{menu.price.toLocaleString()}</td>
