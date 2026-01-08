@@ -1,19 +1,15 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 // ----------------------------------------------------
 // ★ 1. 渡されるデータの型をエラーメッセージを元に定義する (PassedMenuData)
@@ -51,9 +47,18 @@ const extendedSchema = updateMenuSchema.extend({
 // Prismaの生成型を使用することもできますが、ここではZodスキーマを元に定義します
 type MenuData = z.infer<typeof extendedSchema>;
 
-// ----------------------------------------------------
-// ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
-// ----------------------------------------------------
+/**
+ * メニュー情報を更新するための編集フォームコンポーネント
+ * * @description
+ * React Hook Form と Zod を使用してバリデーションを行い、
+ * モーダル形式でメニューの名称、価格、カテゴリー、詳細などを編集します。
+ * データの変更を監視し、`menuData` が更新された場合はフォームをリセットします。
+ * * @param {Props} props - コンポーネントに渡されるプロパティ
+ * @param {PassedMenuData} props.menuData - 編集対象となる初期メニューデータ（DB取得値）
+ * @param {string[]} props.menuTypeOptions - セレクトボックスに表示するメニュータイプの選択肢一覧
+ * @param {() => void} props.onClose - 更新完了時またはキャンセル時にモーダルを閉じるためのコールバック関数
+ * * @returns {JSX.Element} メニュー編集フォームを含むカード型UI
+ */
 export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: Props) {
 
   const form = useForm<MenuData>({ // ★変更: MenuData を型として指定
