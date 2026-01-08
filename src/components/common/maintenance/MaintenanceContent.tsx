@@ -232,7 +232,7 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                             >
                             {/* 1. 編集ボタンをトリガーにする！ */}
                             <DialogTrigger asChild>
-                                <Button size="lg" variant="outline" className="bg-cyan-500 text-white">
+                                <Button size="lg" className="bg-cyan-500 hover:bg-cyan-400 text-white transition-colors">
                                     編集
                                 </Button>
                             </DialogTrigger>
@@ -249,7 +249,8 @@ const MenuTable = ({ menus, handleDelete, router, menuTypeOptions }:
                                 フォーム送信後にモーダルを閉じるロジック（setOpen(false)など）を忘れずにね！ */}
                             </DialogContent>
                             </Dialog>
-                                <Button size="lg" variant="destructive" onClick={() => handleDelete('menu', menu.m_id)}>
+                                <Button size="lg" className="bg-red-500 hover:bg-red-400 text-white transition-colors"
+                                 onClick={() => handleDelete('menu', menu.m_id)}>
                                     削除
                                 </Button>
                             </td>
