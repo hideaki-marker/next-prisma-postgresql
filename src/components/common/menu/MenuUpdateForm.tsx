@@ -1,19 +1,15 @@
-"use client"; // Client Component として動作させるために必要
+"use client";
 
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { updateMenuSchema } from "@/components/common/formSchemas";
-import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 // ----------------------------------------------------
 // ★ 1. 渡されるデータの型をエラーメッセージを元に定義する (PassedMenuData)
@@ -42,36 +38,39 @@ type Props = {
 }
 
 // フォームのスキーマを定義
-const formSchema = z.object({
-  id: z.string().optional(), // ★追加: 更新対象のID。URLから取得するためoptionalとする
-  menuName: z.string().min(1, { message: "メニュー名は必須です。" }),
-  price: z.number().min(0, { message: "価格は0以上である必要があります。" }),
-  orderFlg: z.number().min(0).max(1),
-  menuType: z.string().min(1, { message: "カテゴリーを選択してください。" }),
-  detail: z.string().max(200, { message: "説明は200文字以内です。" }).optional(),
+// 2. 共通スキーマに id を追加して「この画面用」に拡張する
+const extendedSchema = updateMenuSchema.extend({
+  id: z.string().optional(),
 });
 
 // メニューデータの型定義（APIから取得するデータ構造に合わせる）
 // Prismaの生成型を使用することもできますが、ここではZodスキーマを元に定義します
-type MenuData = z.infer<typeof formSchema>;
+type MenuData = z.infer<typeof extendedSchema>;
 
-
-// ----------------------------------------------------
-// ★ 3. コンポーネントの関数シグネチャと defaultValues を修正する
-// ----------------------------------------------------
+/**
+ * メニュー情報を更新するための編集フォームコンポーネント
+ * * @description
+ * React Hook Form と Zod を使用してバリデーションを行い、
+ * モーダル形式でメニューの名称、価格、カテゴリー、詳細などを編集します。
+ * データの変更を監視し、`menuData` が更新された場合はフォームをリセットします。
+ * * @param {Props} props - コンポーネントに渡されるプロパティ
+ * @param {PassedMenuData} props.menuData - 編集対象となる初期メニューデータ（DB取得値）
+ * @param {string[]} props.menuTypeOptions - セレクトボックスに表示するメニュータイプの選択肢一覧
+ * @param {() => void} props.onClose - 更新完了時またはキャンセル時にモーダルを閉じるためのコールバック関数
+ * * @returns {JSX.Element} メニュー編集フォームを含むカード型UI
+ */
 export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: Props) {
 
   const form = useForm<MenuData>({ // ★変更: MenuData を型として指定
     resolver: zodResolver(updateMenuSchema),
     defaultValues: {
-             id: String(menuData.m_id), 
-             menuName: menuData.m_name,
-             price: menuData.price,
-             orderFlg: menuData.orderFlg === true ? 1 : 0,
-             menuType: menuData.menuType.t_name || "",
-             detail: menuData.detail || "",
-        },
-  });
+        id: String(menuData.m_id), 
+        menuName: menuData.m_name,
+        price: menuData.price,
+        orderFlg: menuData.orderFlg === true ? 1 : 0,
+        menuType: menuData.menuType?.t_name || "",
+        detail: menuData.detail || "",
+        },  });
 
   useEffect(() => {
         if (menuData) {
@@ -92,25 +91,6 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
         // menuData が変更されたとき、このフォームも再初期化される
     }, [menuData, form]);
   
-  const [menuType, setMenuType] = useState<string[]>([]); // ★変更: 変数名を menuType から menuTypeOptions に変更
-
-  // カテゴリー（menuType）の取得
-  useEffect(() => {
-    async function fetchMenuTypeOptions() { // ★変更: 関数名を fetchMenuType から fetchMenuTypeOptions に変更
-      try {
-        const response = await fetch('/api/menuType');
-        if (!response.ok) {
-          throw new Error('Failed to fetch menu types');
-        }
-        const data: string[] = await response.json();
-        setMenuType(data);
-      } catch (error) {
-        console.error("Error fetching menu types:", error);
-      }
-    }
-    fetchMenuTypeOptions();
-  }, [form]);
-
 
 
   // フォーム送信時の処理
@@ -139,7 +119,7 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
 
       const updatedMenuData: PassedMenuData = await response.json();
       console.log("更新成功:", updatedMenuData);
-      // alert('メニューが正常に更新されました！'); // 成功メッセージを表示
+      alert('メニューが正常に更新されました！'); // 成功メッセージを表示
       // form.reset(); // 更新なのでリセットは不要、または更新された値で再設定
       // 必要であれば、更新後に別のページにリダイレクトすることも可能
       // useRouter().push('/showMenu'); など
@@ -155,47 +135,32 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
     // ページ全体の中央寄せは、このコンポーネントの外側で設定するとして、
     // ここではフォーム本体を Card で美しく囲むよ！
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl mx-auto space-y-8 p-4 md:p-6">
-        
-        <Card>
-          
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl mx-auto space-y-6 p-0">
+        <Card className="border-none shadow-none gap-0">
           {/* ページのヘッダー部分 */}
-          <CardHeader className="border-b">
+          <CardHeader className="bg-[#4A2C2A] text-white pt-0 pb-4 border-b">
             <div className="flex items-center justify-between">
-              {/* 戻るリンクを Button でスタイリッシュに */}
-              <Link href="/adminIndex" passHref>
-                <Button variant="ghost" size="sm" className="space-x-1">
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>管理者ページへ</span>
-                </Button>
-              </Link>
-              
               {/* タイトル */}
               <CardTitle className="text-3xl font-bold tracking-tight flex-1 text-center pr-12">
                 メニューの更新
               </CardTitle>
             </div>
           </CardHeader>
-
-          <CardContent className="pt-6">
-            
+          <CardContent className="pt-0">
             {/* メニューID表示（強調） */}
             <div className="text-center mb-6 p-3 bg-gray-50 border rounded-lg">
               <p className="text-sm text-gray-500">更新対象メニューID:</p>
               <p className="font-extrabold text-2xl text-blue-600">{menuData.m_id}</p>
             </div>
-
             {/* MenuFormFields 本体 */}
             <MenuFormFields control={form.control} menuTypeOptions={menuTypeOptions} />
-
           </CardContent>
-
           <CardFooter className="pt-6 border-t flex justify-center">
             {/* 更新ボタンを shadcn の Button に変更 */}
             <Button 
               type="submit"
               size="lg" // 大きめのボタンで目立たせる
-              className="w-1/2 md:w-1/3 text-lg"
+              className="bg-[#4A2C2A] w-1/2 md:w-1/3 text-lg"
               disabled={form.formState.isSubmitting} // ロード状態は formState を使うとスマート
             >
               {form.formState.isSubmitting ? (
@@ -205,7 +170,6 @@ export default function MenuUpdateForm({ menuData, menuTypeOptions, onClose }: P
               )}
             </Button>
           </CardFooter>
-          
         </Card>
       </form>
     </Form>

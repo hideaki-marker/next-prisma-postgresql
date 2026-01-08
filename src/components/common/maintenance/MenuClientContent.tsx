@@ -1,5 +1,3 @@
-// src/components/common/maintenance/MenuClientContent.tsx
-
 "use client"; // ★ クライアントコンポーネントであることを宣言！
 
 import { useEffect, useState } from 'react';

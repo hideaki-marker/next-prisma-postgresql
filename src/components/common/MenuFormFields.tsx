@@ -33,6 +33,13 @@ interface MenuFormFieldsProps {
   menuTypeOptions: string[];
 }
 
+/**
+ * メニュー編集モーダル内の入力フォーム項目コンポーネント
+ *  @param {MenuFormFieldsProps} props - コンポーネントに渡されるプロパティ
+ * @param {Control<MenuFormData>} props.control - React Hook Form の制御オブジェクト
+ * @param {string[]} props.menuTypeOptions - 選択可能なカテゴリー（メニュータイプ）のリスト
+ * @returns {JSX.Element} メニュー編集用の入力フィールド群
+ */
 export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps) {
   return (
     <>
@@ -42,6 +49,7 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
         name="menuName"
         render={({ field }) => (
           <FormItem className="flex flex-col items-center">
+            <br />
             <FormLabel>メニュー名</FormLabel>
             <FormControl className="w-full flex justify-center">
               <Input type="text" placeholder="名前" {...field} className="w-2/3 mx-auto" />
@@ -51,7 +59,6 @@ export function MenuFormFields({ control, menuTypeOptions }: MenuFormFieldsProps
         )}
       />
       <br />
-
       {/* 価格フィールド */}
       <FormField
         control={control}
