@@ -17,8 +17,18 @@ type Props = {
 export default function ReturnButton({ isLoggedIn, returnUrl }: Props) {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+
+  // --- URLの安全性をチェックする関数 ---
+  const getSafeReturnUrl = (url: string | undefined): string => {
+    // 1. urlが空、または「/」から始まらない（外部サイトなど）場合は、デフォルト値を返す
+    // 「//」から始まるURLも外部へのショートカットになるため禁止する
+    if (!url || !url.startsWith('/') || url.startsWith('//')) {
+      return isLoggedIn ? '/myPage' : '/';
+    }
+    return url;
+  };
   // 1. returnUrlがあればそれを使い、なければログイン状態で判定する
-  const finalHref = returnUrl || (isLoggedIn ? '/myPage' : '/');
+  const finalHref = getSafeReturnUrl(returnUrl);
 
   // クリック時の処理
   const handleNavigation = () => {
