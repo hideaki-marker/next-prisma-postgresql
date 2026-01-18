@@ -1,41 +1,54 @@
 // src/app/api/menu/route.ts
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers'; // 追加
-import jwt from 'jsonwebtoken'; // 追加
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
+import { commonMenuSchema } from "@/components/common/formSchemas";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET as string; // 環境変数から取得
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export async function POST(request: Request) {
-  // ==========================================
-  // 🔐 認証チェック（ここが金庫の鍵になります）
-  // ==========================================
+  // --- 1. サーバー設定チェック (500エラー) ---
+  if (!JWT_SECRET) {
+    console.error('致命的エラー: JWT_SECRET が設定されていません。');
+    return NextResponse.json({ message: 'サーバー設定エラー' }, { status: 500 });
+  }
+
+  // --- 2. 認証チェック (401エラー) ---
   const cookieStore = await cookies();
   const token = cookieStore.get('admin_auth_token');
 
-  // トークンがない、または秘密鍵が設定されていない場合は即座に拒否
-  if (!token || !JWT_SECRET) {
+  if (!token) {
     return NextResponse.json({ message: '認証が必要です。' }, { status: 401 });
   }
 
   try {
-    // トークンの署名を検証
+    // ★重要：ここが「鍵」を回して本物か確かめる作業です
     jwt.verify(token.value, JWT_SECRET);
   } catch (error) {
-    console.error('API認証エラー:', error);
-    // 署名が不正、または期限切れの場合は拒否
-    return NextResponse.json({ message: '不正なセッションです。再ログインしてください。' }, { status: 401 });
+    return NextResponse.json({ message: '不正なセッションです。' }, { status: 401 });
   }
 
-  // ==========================================
-  // ✅ 認証成功後の処理（ここからは安全な領域）
-  // ==========================================
+  // --- 3. バリデーション & 登録処理 ---
   try {
-    const body = await request.json();
-    const { menuName, price, orderFlg, menuType, detail } = body;
+    // request.json() はここで1回だけ呼ぶ
+    const rawBody = await request.json();
+    
+    // Zodでバリデーション
+    const validationResult = commonMenuSchema.safeParse(rawBody);
 
-    // 1. menuType から t_id を検索
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        message: '入力内容に誤りがあります。', 
+        errors: validationResult.error.format() 
+      }, { status: 400 });
+    }
+
+    // 検証済みのきれいなデータを使用する
+    const { menuName, price, orderFlg, menuType, detail } = validationResult.data;
+
+    // --- DB操作 ---
     const foundMenuType = await prisma.menuType.findUnique({
       where: { t_name: menuType },
       select: { t_id: true },
@@ -48,7 +61,6 @@ export async function POST(request: Request) {
     const t_id = foundMenuType.t_id;
     const isOrderable = Boolean(orderFlg);
 
-    // 2. menu テーブルにデータを挿入
     const newMenu = await prisma.menu.create({
       data: {
         m_name: menuName,
@@ -63,10 +75,7 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error('メニュー登録エラー:', error);
-    if (error instanceof Error) {
-      return NextResponse.json({ message: 'メニュー登録に失敗しました。', error: error.message }, { status: 500 });
-    }
-    return NextResponse.json({ message: 'メニュー登録に失敗しました。', error: '不明なエラー' }, { status: 500 });
+    return NextResponse.json({ message: 'メニュー登録に失敗しました。' }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
