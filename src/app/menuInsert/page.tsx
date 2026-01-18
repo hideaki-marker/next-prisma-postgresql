@@ -62,9 +62,8 @@ export default function MenuInsertPage() {
     } catch (error) {
       console.error("初期化エラー:", error);
       // エラーが起きた際も安全のためにログインへ飛ばす
-      router.push("/login");
-    }
-  }
+      router.push("/adminLogin");
+    }  }
     initializePage();
     }, [form, router]); // formインスタンスが変更された場合のみ再実行 (通常は初回のみ)
 
@@ -118,22 +117,22 @@ if (isAuthChecking) {
         {/* ★変更点★: 共通コンポーネントを呼び出し */}
        <MenuFormFields control={form.control} menuTypeOptions={menuType} />
        <div className="flex justify-center w-full "> 
+          {/* ボタン幅: 短く調整, mx-auto と md:ml-auto で中央と右寄せを切り替え */}
           <Button
             type="submit"
             className="
               bg-blue-500 hover:bg-blue-700 text-white font-bold
               py-3 px-8 rounded-lg text-lg tracking-wider
               transition-colors duration-200 ease-in-out
-              w-1/4 md:w-1/6 lg:w-1/12 xl:w-1/12 {/* ここを短く調整 */}
-              mx-auto md:ml-auto md:mr-0 {/* mx-auto と md:ml-auto で中央と右寄せを切り替え */}
+              w-1/4 md:w-1/6 lg:w-1/12 xl:w-1/12
+              mx-auto md:ml-auto md:mr-0
             " 
           >
             登録
           </Button>
         </div>
         <br /> {/* ボタンの下に管理者ページとのスペースを空けるため */}
-        <ReturnButton isLoggedIn={isAuthChecking} returnUrl="/adminIndex" />
-      </form>
+        <ReturnButton isLoggedIn={true} returnUrl="/adminIndex" />      </form>
     </Form>
   );
 }
