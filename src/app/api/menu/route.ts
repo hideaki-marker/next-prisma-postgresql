@@ -1,61 +1,82 @@
 // src/app/api/menu/route.ts
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
+import { commonMenuSchema } from "@/components/common/formSchemas";
 
 const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    // フォームから送られてくるデータの型と一致するように定義
-    const { menuName, price, orderFlg, menuType, detail } = body;
+  // --- 1. サーバー設定チェック (500エラー) ---
+  if (!JWT_SECRET) {
+    console.error('致命的エラー: JWT_SECRET が設定されていません。');
+    return NextResponse.json({ message: 'サーバー設定エラー' }, { status: 500 });
+  }
 
-    // 1. menuType (カテゴリー名) から t_id を検索
-    // menuテーブルのt_idはmenuTypeテーブルのt_idを参照しているため、
-    // まずmenuTypeのt_nameからt_idを取得する必要があります。
+  // --- 2. 認証チェック (401エラー) ---
+  const cookieStore = await cookies();
+  const token = cookieStore.get('admin_auth_token');
+
+  if (!token) {
+    return NextResponse.json({ message: '認証が必要です。' }, { status: 401 });
+  }
+
+  try {
+    // ★重要：ここが「鍵」を回して本物か確かめる作業です
+    jwt.verify(token.value, JWT_SECRET);
+  } catch (error) {
+    return NextResponse.json({ message: '不正なセッションです。' }, { status: 401 });
+  }
+
+  // --- 3. バリデーション & 登録処理 ---
+  try {
+    // request.json() はここで1回だけ呼ぶ
+    const rawBody = await request.json();
+    
+    // Zodでバリデーション
+    const validationResult = commonMenuSchema.safeParse(rawBody);
+
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        message: '入力内容に誤りがあります。', 
+        errors: validationResult.error.format() 
+      }, { status: 400 });
+    }
+
+    // 検証済みのきれいなデータを使用する
+    const { menuName, price, orderFlg, menuType, detail } = validationResult.data;
+
+    // --- DB操作 ---
     const foundMenuType = await prisma.menuType.findUnique({
-      where: {
-        t_name: menuType, // フォームから送られてきたカテゴリー名
-      },
-      select: {
-        t_id: true,
-      },
+      where: { t_name: menuType },
+      select: { t_id: true },
     });
 
     if (!foundMenuType) {
-      // 指定されたカテゴリー名が見つからない場合のエラーハンドリング
       return NextResponse.json({ message: '指定されたカテゴリーが見つかりません。' }, { status: 400 });
     }
 
     const t_id = foundMenuType.t_id;
+    const isOrderable = Boolean(orderFlg);
 
-    // 2. orderFlg (数値 0/1) を Boolean に変換
-    // PrismaのスキーマではBoolean型なので変換が必要です
-    const isOrderable = Boolean(orderFlg); // 0はfalse、1はtrueに変換されます
-
-    // 3. menu テーブルにデータを挿入
     const newMenu = await prisma.menu.create({
       data: {
-        m_name: menuName, // フォームの menuName を m_name にマッピング
-        detail: detail, // フォームの description を detail にマッピング
-        orderFlg: isOrderable, // 変換した Boolean 値を使用
-        price: price, // フォームの price を price にマッピング
-        t_id: t_id, // 検索した t_id を t_id にマッピング
+        m_name: menuName,
+        detail: detail,
+        orderFlg: isOrderable,
+        price: price,
+        t_id: t_id,
       },
     });
 
-    // 成功レスポンス
     return NextResponse.json({ message: 'メニューが正常に登録されました。', menu: newMenu }, { status: 201 });
 
   } catch (error) {
     console.error('メニュー登録エラー:', error);
-    // エラーレスポンス
-    if (error instanceof Error) {
-      return NextResponse.json({ message: 'メニュー登録に失敗しました。', error: error.message }, { status: 500 });
-    }
-    return NextResponse.json({ message: 'メニュー登録に失敗しました。', error: '不明なエラー' }, { status: 500 });
+    return NextResponse.json({ message: 'メニュー登録に失敗しました。' }, { status: 500 });
   } finally {
-    // Prisma Clientの接続を切断 (開発中は不要な場合もありますが、本番環境では重要です)
     await prisma.$disconnect();
   }
 }

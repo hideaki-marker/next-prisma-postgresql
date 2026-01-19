@@ -1,5 +1,4 @@
-// src/app/menuInsert/page.tsx
-"use client"; // Client Component として動作させるために必要
+"use client";
 
 import { useForm } from "react-hook-form"; // useForm をインポート
 // Form, FormField もインポートする
@@ -9,9 +8,10 @@ import {
 import { z } from "zod"; // バリデーションのため (もし zod を使うなら)
 import { zodResolver } from "@hookform/resolvers/zod"; // zodResolver をインポート (もし zod を使うなら)
 import { useEffect, useState } from "react"; // useEffect と useState をインポート
+import { useRouter } from "next/navigation"; // ルーターをインポート
 import { MenuFormFields } from "@/components/common/MenuFormFields";
 import { commonMenuSchema } from "@/components/common/formSchemas";
-import { Link } from "lucide-react";
+import ReturnButton from "@/components/common/ReturnButton";
 import { Button } from "@/components/ui/button";
 
 type MenuData = z.infer<typeof commonMenuSchema>;
@@ -29,28 +29,43 @@ export default function MenuInsertPage() {
     },
   });
 
-   const [menuType, setMenuType] = useState<string[]>([]); // menuTypesを保持するstate
+    const [menuType, setMenuType] = useState<string[]>([]); // menuTypesを保持するstate
+    const router = useRouter();
+    const [isAuthChecking, setIsAuthChecking] = useState(true); // 認証チェック中フラグ
 
    useEffect(() => {
     // コンポーネントマウント時にAPIからmenuTypesを取得
-    async function fetchMenuType() {
+    async function initializePage() {
       try {
-        const response = await fetch('/api/menuType');
-        if (!response.ok) {
-          throw new Error('Failed to fetch menu types');
-        }
-        const data: string[] = await response.json();
-        setMenuType(data);
-        // 最初の項目をデフォルト値として設定するか、空のままにするか選択
-        if (data.length > 0 && !form.getValues().menuType) {
-            form.setValue('menuType', data[0]); // 最初の項目をデフォルトに設定
-        }
-      } catch (error) {
-        console.error("Error fetching menu types:", error);
+      // 1. サーバー側のAPIを叩いて認証チェックを行う
+      const authResponse = await fetch('/api/admin/check');
+      
+      if (!authResponse.ok) {
+        alert("セッションが切れました。ログインしてください。");
+        router.push("/adminLogin"); 
+        return;
       }
-    }
-    fetchMenuType();
-  }, [form]); // formインスタンスが変更された場合のみ再実行 (通常は初回のみ)
+
+      // 2. 認証がOKならデータを取得する
+      const response = await fetch('/api/menuType');
+      if (!response.ok) throw new Error('Failed to fetch menu types');
+      
+      const data: string[] = await response.json();
+      setMenuType(data);
+      
+      if (data.length > 0 && !form.getValues().menuType) {
+        form.setValue('menuType', data[0]);
+      }
+
+      // 全ての準備が整ったら表示
+      setIsAuthChecking(false);
+    } catch (error) {
+      console.error("初期化エラー:", error);
+      // エラーが起きた際も安全のためにログインへ飛ばす
+      router.push("/adminLogin");
+    }  }
+    initializePage();
+    }, [form, router]); // formインスタンスが変更された場合のみ再実行 (通常は初回のみ)
 
   // フォーム送信時の処理
   async function onSubmit(values: z.infer<typeof commonMenuSchema>) { // async を追加
@@ -82,6 +97,14 @@ export default function MenuInsertPage() {
   }
 }
 
+if (isAuthChecking) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p className="text-xl font-semibold">認証を確認中...</p>
+    </div>
+  );
+}
+
   return (
     // 2. Form コンポーネントでフォーム全体をラップし、useForm の結果を渡す
     <Form {...form}>
@@ -93,31 +116,23 @@ export default function MenuInsertPage() {
         {/* 4. FormField で各入力フィールドをラップする */}
         {/* ★変更点★: 共通コンポーネントを呼び出し */}
        <MenuFormFields control={form.control} menuTypeOptions={menuType} />
-        
-        {/* ★変更点: ここにあった <br /> を削除し、ボタンをラップする div にマージします */}
-        
-        {/* ★ここから登録ボタンの修正★ */}
        <div className="flex justify-center w-full "> 
+          {/* ボタン幅: 短く調整, mx-auto と md:ml-auto で中央と右寄せを切り替え */}
           <Button
             type="submit"
             className="
               bg-blue-500 hover:bg-blue-700 text-white font-bold
               py-3 px-8 rounded-lg text-lg tracking-wider
               transition-colors duration-200 ease-in-out
-              w-1/4 md:w-1/6 lg:w-1/12 xl:w-1/12 {/* ここを短く調整 */}
-              mx-auto md:ml-auto md:mr-0 {/* mx-auto と md:ml-auto で中央と右寄せを切り替え */}
+              w-1/4 md:w-1/6 lg:w-1/12 xl:w-1/12
+              mx-auto md:ml-auto md:mr-0
             " 
           >
             登録
           </Button>
         </div>
-        {/* ★ここまで登録ボタンの修正★ */}
-
         <br /> {/* ボタンの下に管理者ページとのスペースを空けるため */}
-        <Link href="/adminIndex" className="flex items-center text-4xl justify-center">
-        <p className="flex items-center text-4xl justify-center">◆管理者ページ</p>
-        </Link>
-      </form>
+        <ReturnButton isLoggedIn={true} returnUrl="/adminIndex" />      </form>
     </Form>
   );
 }
