@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AdminBar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,18 +33,19 @@ export default function AdminBar() {
         throw new Error("Logout failed");
       }
       setIsLoggedIn(false);
+      toast.success("ログアウトしました");
       router.push("/");
       router.refresh();
     } catch (error) {
       // 4. 失敗した場合は、ユーザーに「まだログアウトできてないよ！」と教える
       console.error("Logout error:", error);
-      alert(
+      toast.error(
         "ログアウトに失敗しました。通信環境を確認して、もう一度お試しください。",
       );
     }
   };
   return (
-    <footer className="p-2 !bg-gray-900 !text-white shadow-lg w-full h-16">
+    <footer className="p-2 bg-[#3d2b1f] text-white shadow-lg w-full h-16">
       <div className="container mx-auto flex justify-end items-center h-full px-6">
         <div className="flex gap-6">
           {" "}
