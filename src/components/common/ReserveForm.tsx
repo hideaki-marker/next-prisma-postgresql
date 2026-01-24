@@ -44,6 +44,18 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       return;
     }
 
+    // JSONの解析を安全に行う
+    let orderData;
+    try {
+      orderData = JSON.parse(orderDataJson);
+    } catch (e) {
+      console.error("JSON parse error:", e);
+      toast.error(
+        "注文データが壊れています。もう一度メニューを選び直してください。",
+      );
+      return;
+    }
+
     // 2. 日時・人数・テーブルの取得
     const time = formData.get("rsv_time") as string;
     const tableIdStr = formData.get("table_id") as string;
@@ -61,6 +73,11 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
     const personCount = parseInt(formData.get("person") as string);
     const tableId = parseInt(tableIdStr);
 
+    if (Number.isNaN(personCount) || Number.isNaN(tableId)) {
+      toast.error("人数またはテーブルの選択が正しくありません。");
+      return;
+    }
+
     // バリデーション（テーブル収容人数など）
     const selectedTable = tableData.find((t) => t.table_id === tableId);
     if (
@@ -73,13 +90,12 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       );
       return;
     }
-
     const result = await createReservation({
       userId,
       rsv_date: rsvDate,
       person: personCount,
       table_id: tableId,
-      orderData: JSON.parse(orderDataJson),
+      orderData: orderData,
     });
 
     if (result.success) {
