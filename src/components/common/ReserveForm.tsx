@@ -113,7 +113,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
         e.preventDefault();
         handleSubmit(new FormData(e.currentTarget));
       }}
-      className="space-y-6 bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-lg mx-auto"
+      className="space-y-6 bg-white p-8 rounded-xl shadow-lg border border-gray-100 w-full"
     >
       <h2 className="text-2xl font-bold mb-6 border-b pb-4 text-gray-800">
         予約詳細の入力
