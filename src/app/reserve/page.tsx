@@ -26,13 +26,15 @@ export default async function ReservePage() {
   const tableData: TableLoc[] = await getAllTableLocs();
 
   return (
-    <div className="min-h-screen w-full flex justify-center py-12">
-      <div className="w-full max-w-xl px-4 flex flex-col items-center">
-        <h1 className="text-4xl font-bold mb-8 text-center">
-          ご予約情報の入力
-        </h1>
-        {/* ★修正: 取得したテーブルデータを props として ReserveForm に渡す */}
-        <div className="w-full">
+    <div className="flex flex-col items-center min-h-screen bg-[url('/reserve.png')] bg-cover bg-center bg-no-repeat bg-fixed">
+      {/* 1. タイトルを消して「空白」にするためのスペーサー */}
+      <div className="h-24 w-full" />
+
+      <div className="w-full max-w-xl px-4 flex flex-col items-center pb-8">
+        {/* ↑ pb-8 にして下側の余白を少し詰めました */}
+
+        {/* 2. フォームコンポーネントを囲む div で高さを出す */}
+        <div className="w-full min-h-[700px] flex flex-col shadow-xl">
           <ReserveForm userId={userId} tableData={tableData} />
         </div>
       </div>
