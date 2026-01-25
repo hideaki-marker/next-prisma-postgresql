@@ -28,15 +28,16 @@ export default function LogoutButton({ className }: LogoutButtonProps) {
         // 2秒後にホーム画面にリダイレクト
         setTimeout(() => {
           router.push("/");
+          setIsLoading(false);
         }, 2000);
       } else {
         toast.error("ログアウトに失敗しました");
         console.error("ログアウトに失敗しました");
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("ネットワークエラーが発生しました");
       console.error("ログアウト中にエラーが発生しました:", error);
-    } finally {
       setIsLoading(false);
     }
   };
