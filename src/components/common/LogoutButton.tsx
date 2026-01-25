@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button"; // shadcn/uiのButtonコンポーネントを想定
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState } from "react"; // ★1. useStateをインポート
-import { Loader2 } from "lucide-react"; // ★2. Loader2アイコンをインポート
-import { cn } from "@/lib/utils"; // shadcnのユーティリティ
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LogoutButtonProps {
   className?: string; // classNameを受け取れるように定義
@@ -13,10 +13,10 @@ interface LogoutButtonProps {
 
 export default function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false); // ★3. ローディング状態を追加
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
-    setIsLoading(true); // ★4. 処理開始時にローディングをtrueに
+    setIsLoading(true);
     try {
       const response = await fetch("/api/logout", {
         method: "POST",
@@ -28,7 +28,6 @@ export default function LogoutButton({ className }: LogoutButtonProps) {
         // 2秒後にホーム画面にリダイレクト
         setTimeout(() => {
           router.push("/");
-          setIsLoading(false);
         }, 2000);
       } else {
         toast.error("ログアウトに失敗しました");
