@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // shadcn/uiのButtonコンポーネントを想定
-import { toast } from 'sonner';
-import { useState } from 'react'; // ★1. useStateをインポート
-import { Loader2 } from 'lucide-react'; // ★2. Loader2アイコンをインポート
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button"; // shadcn/uiのButtonコンポーネントを想定
+import { toast } from "sonner";
+import { useState } from "react"; // ★1. useStateをインポート
+import { Loader2 } from "lucide-react"; // ★2. Loader2アイコンをインポート
 import { cn } from "@/lib/utils"; // shadcnのユーティリティ
 
 interface LogoutButtonProps {
@@ -18,55 +18,57 @@ export default function LogoutButton({ className }: LogoutButtonProps) {
   const handleLogout = async () => {
     setIsLoading(true); // ★4. 処理開始時にローディングをtrueに
     try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
+      const response = await fetch("/api/logout", {
+        method: "POST",
       });
 
       if (response.ok) {
         // ログアウト成功時にトースト通知を表示
-        toast.success('ログアウトしました');
+        toast.success("ログアウトしました");
         // 2秒後にホーム画面にリダイレクト
         setTimeout(() => {
-          router.push('/');
+          router.push("/");
         }, 2000);
       } else {
-        toast.error('ログアウトに失敗しました');
-        console.error('ログアウトに失敗しました');
+        toast.error("ログアウトに失敗しました");
+        console.error("ログアウトに失敗しました");
       }
     } catch (error) {
-      toast.error('ネットワークエラーが発生しました');
-      console.error('ログアウト中にエラーが発生しました:', error);
+      toast.error("ネットワークエラーが発生しました");
+      console.error("ログアウト中にエラーが発生しました:", error);
     } finally {
       setIsLoading(false);
     }
   };
   return (
-    <Button 
+    <Button
       onClick={handleLogout}
-      variant="outline" 
+      variant="outline"
       disabled={isLoading} // ★7. ローディング中はボタンを無効化
       // cn() を使うことで、デフォルトスタイルと引数の className をマージします
       className={cn(
-        "bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6 relative cursor-pointer", 
-        className
+        "bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6 relative cursor-pointer",
+        className,
       )}
     >
       <div className="flex items-center justify-center">
-        {/* ★8. ローディング中はスピナーを表示し、テキストを見えなくする★ */}
-        
-        {/* スピナー: ローディング中のみ表示 */}
+        {/* 1. スピナー：isLoadingの時だけ「絶対配置」で中央に表示 */}
         {isLoading && (
-          <div className="flex items-center justify-center">
-          <Loader2 className="mr-2 h-6 w-6 animate-spin absolute" />
-          ログアウト処理中...
+          <div className="absolute inset-0 flex items-center justify-center gap-3">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="text-xl">処理中...</span>
           </div>
         )}
-        
-        {/* テキスト: ローディング中は透明にして、幅を保持する */}
-        <span className={isLoading ? "opacity-0" : ""}> 
+
+        {/* 2. テキスト：isLoading中は opacity-0 で消すが、幅（占有面積）は残る */}
+        <span
+          className={cn(
+            "transition-opacity duration-200",
+            isLoading ? "opacity-0" : "opacity-100",
+          )}
+        >
           ログアウト
         </span>
-
       </div>
     </Button>
   );
