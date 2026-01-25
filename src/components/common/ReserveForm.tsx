@@ -113,20 +113,18 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
         e.preventDefault();
         handleSubmit(new FormData(e.currentTarget));
       }}
-      // bg-white/95 と backdrop-blur-sm で「すりガラス」効果を追加
       className="flex-1 bg-white/95 backdrop-blur-sm p-10 rounded-xl shadow-2xl border border-white/20 w-full flex flex-col"
     >
-      {/* flex-grow: 余白部分をこのエリアで埋める
-      flex flex-col justify-around: 中の項目を均等に分配する
-    */}
-      <div className="flex-grow flex flex-col justify-around min-h-[500px]">
-        <h2 className="text-2xl font-bold border-b pb-4 text-gray-800">
-          予約詳細の入力
-        </h2>
+      {/* 1. タイトル部分を均等配置の外に出す（これで余白が固定されます） */}
+      <h2 className="text-2xl font-bold text-white flex items-center justify-center h-20 mb-8 bg-gray-900 rounded-t-xl -mt-10 -mx-10 shadow-inner">
+        <span>予約詳細の入力</span>
+      </h2>
 
+      {/* 2. 入力項目だけを flex-grow で囲み、ここで余白を均等に分配する */}
+      <div className="flex-grow flex flex-col justify-around min-h-[450px]">
         {/* 予約日付 */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">予約日</label>
+          <label className="text-lg font-medium text-gray-700">予約日</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -160,7 +158,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
 
         {/* 予約時間 */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">予約時間</label>
+          <label className="text-lg font-medium text-gray-700">予約時間</label>
           <Select name="rsv_time" required>
             <SelectTrigger className="h-12">
               <SelectValue placeholder="時間を選択" />
@@ -182,7 +180,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
 
         {/* 予約人数 */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="person" className="text-sm font-medium text-gray-700">
+          <label htmlFor="person" className="text-lg font-medium text-gray-700">
             予約人数
           </label>
           <Input
@@ -199,7 +197,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
 
         {/* テーブル選択 */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">テーブル</label>
+          <label className="text-lg font-medium text-gray-700">テーブル</label>
           <Select name="table_id" required>
             <SelectTrigger className="h-12">
               <SelectValue placeholder="テーブルを選択" />
