@@ -12,17 +12,16 @@ model users {
   id         Int       @id @default(autoincrement())
   name       String    @unique
   password   String
-  created_at DateTime  @db.Timestamp(6)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
   reserves   reserve[]
 }
 
 model admin {
+  adm_id     Int      @id @default(autoincrement())
   adm_name   String   @unique @db.VarChar(30)
-  password   String   @db.VarChar(64)
+  password   String   @db.VarChar(255) // ハッシュ化に対応できるよう長めに
   exp        String
-  created_at DateTime @db.Timestamp(6)
-
-  @@id([adm_name, password])
+  created_at DateTime @default(now()) @db.Timestamp(6)
 }
 
 model menu {
@@ -34,6 +33,7 @@ model menu {
   t_id     Int      @db.SmallInt
   menuType menuType @relation(fields: [t_id], references: [t_id])
   courseCtl courseCtl[] 
+  reserveDetail reserveDetail[] // リレーションの逆参照用
 }
 
 model menuType {
@@ -60,6 +60,20 @@ model reserve {
   table_id  Int
   table_loc table_loc @relation(fields: [table_id], references: [table_id])
   app_date  DateTime  @default(now()) @db.Timestamp(6)
+  details   reserveDetail[]
+}
+
+// ★今回の目玉：予約の注文明細
+model reserveDetail {
+  rd_id    Int     @id @default(autoincrement())
+  rsv_id   Int
+  m_id     Int?    // 単品メニューID
+  c_id     Int?    // コースID
+  quantity Int     @default(1)
+
+  reserve  reserve @relation(fields: [rsv_id], references: [rsv_id])
+  menu     menu?   @relation(fields: [m_id], references: [m_id])
+  course   course? @relation(fields: [c_id], references: [c_id])
 }
 
 model course {
@@ -71,6 +85,7 @@ model course {
   t_id     Int
   menuType menuType @relation(fields: [t_id], references: [t_id]) 
   courseCtl courseCtl[] 
+  reserveDetail reserveDetail[] // リレーションの逆参照用
 }
 
 model courseCtl {
