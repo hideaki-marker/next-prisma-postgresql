@@ -36,9 +36,10 @@ async function main() {
   ];
   for (const t of tables) {
     await prisma.table_loc.upsert({
-      where: { table_id: tables.indexOf(t) + 1 },
-      update: {},
-      create: t,
+      // ID（連番）ではなく、ユニークな「テーブル名」で存在チェックを行う
+      where: { table_name: t.table_name },
+      update: {}, // すでにある場合は更新しない（または必要に応じて更新内容を書く）
+      create: t, // ない場合は新規作成
     });
   }
 
