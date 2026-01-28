@@ -1,4 +1,3 @@
-// prisma/seed.ts
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs"; // ESM形式に合わせて修正
 
@@ -59,8 +58,16 @@ async function main() {
   }
 
   // --- 4. 管理者 (admin) の作成 ---
-  const adminPassword = "admin"; // 実際の運用ではより強力なパスにする必要があります
-  const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+
+  if (!adminPassword && process.env.NODE_ENV === "production") {
+    throw new Error("本番環境では SEED_ADMIN_PASSWORD の設定が必須です。");
+  }
+
+  // 開発環境なら "admin" をデフォルトにしても良いですが、指摘に従い変数化
+  const passwordToHash = adminPassword || "admin";
+
+  const hashedAdminPassword = await bcrypt.hash(passwordToHash, 10);
 
   await prisma.admin.upsert({
     where: { adm_name: "admin" },
@@ -75,7 +82,14 @@ async function main() {
     },
   });
 
-  console.log("Menu types seeded successfully!");
+  // seed.ts の最後
+  console.log("-----------------------------------------");
+  console.log("✅ Seed process completed successfully!");
+  console.log(" - Menu types & Menus");
+  console.log(" - Table locations");
+  console.log(" - Test users");
+  console.log(" - Admin account");
+  console.log("-----------------------------------------");
 }
 main()
   .catch((e) => {
