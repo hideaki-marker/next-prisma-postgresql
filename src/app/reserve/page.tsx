@@ -7,6 +7,22 @@ import ReserveForm from "@/components/common/ReserveForm"; // 次に作成する
 import { getAllTableLocs } from "./actions";
 import { TableLoc } from "@/type/db";
 
+/**
+ * 予約入力ページ
+ * * クッキーから認証トークンを確認し、未認証の場合はログインページへリダイレクトします。
+ * データベースから予約可能なテーブル情報を取得し、予約フォームへと渡します。
+ * 背景画像に '/reserve.png' を使用した、没入感のあるフルスクリーンレイアウトを提供します。
+ * * @async
+ * @function ReservePage
+ * @returns {Promise<JSX.Element>} 認証チェック済みの予約入力画面
+ * * @example
+ * // 内部フロー:
+ * // 1. Cookieから 'auth_token' を取得
+ * // 2. トークンがない場合は /login へリダイレクト
+ * // 3. ユーザーIDを特定 (現在は仮ID: 1)
+ * // 4. DBから TableLoc[] (テーブル情報) を取得
+ * // 5. ReserveForm コンポーネントにデータを渡してレンダリング
+ */
 export default async function ReservePage() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get("auth_token")?.value;
