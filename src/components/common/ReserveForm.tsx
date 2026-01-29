@@ -31,6 +31,11 @@ type ReserveFormProps = {
   tableData: TableLoc[];
 };
 
+/**
+ * 予約入力コンポーネント
+ * @param param0
+ * @returns
+ */
 export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
   const router = useRouter();
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -44,20 +49,27 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       try {
         const data = JSON.parse(orderDataJson);
         // コースか単品かで表示を切り分ける（UI用）
-        if (data.courseId) {
-          setOrderSummary(`コース予約 (ID: ${data.courseId})`);
-        } else if (Array.isArray(data) && data.length > 0) {
-          // 1. まず名前と数量のリストを作成
-          const names = data
-            .map((item: any) => `${item.name} × ${item.quantity}`)
-            .join(", ");
+        if (Array.isArray(data) && data.length > 0) {
+          // 1. まずコースがあるか探す
+          const courseItem = data.find((item: any) => item.type === "course");
 
-          // 2. 「点数」と「詳細」をひとまとめにしてセットする
-          // 例: 「単品メニュー 2 点: マルゲリータ × 1, ジェノベーゼ × 1」
-          setOrderSummary(`単品メニュー ${data.length} 点: ${names}`);
+          if (courseItem) {
+            // コース名があれば表示、なければIDを表示
+            setOrderSummary(
+              `コース予約: ${courseItem.name || `ID: ${courseItem.id}`}`,
+            );
+          } else {
+            // 2. なければ単品メニューとして処理
+            const menuItems = data.filter((item: any) => item.type === "menu");
+            const names = menuItems
+              .map((item: any) => `${item.name} × ${item.quantity}`)
+              .join(", ");
+
+            setOrderSummary(`単品メニュー ${menuItems.length} 点: ${names}`);
+          }
         }
       } catch (e) {
-        console.error(e);
+        console.error("注文データのパースに失敗しました:", e);
       }
     }
   }, []);
@@ -92,18 +104,25 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
     const personCount = parseInt(formData.get("person") as string);
     const tableId = parseInt(tableIdStr);
 
+    if (isNaN(personCount) || isNaN(tableId)) {
+      toast.error("予約人数、またはテーブルの選択が正しくありません。");
+      return;
+    }
+
     const selectedTable = tableData.find((t) => t.table_id === tableId);
     if (
       !selectedTable ||
       personCount < 1 ||
       personCount > selectedTable.max_capacity
     ) {
+      // 名前が取れない場合の予備テキスト（フォールバック）を用意
+      const tableName = selectedTable?.table_name ?? "指定のテーブル";
+
       toast.error(
-        `人数が不正、または${selectedTable?.table_name}の定員を超えています。`,
+        `人数が不正、または${tableName}の定員（${selectedTable?.max_capacity ?? "?"}名）を超えています。`,
       );
       return;
     }
-
     // --- ここでバックエンドの形式に合わせてデータを整形 ---
     const result = await createReservation({
       userId,
