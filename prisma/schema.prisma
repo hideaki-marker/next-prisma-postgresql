@@ -46,7 +46,7 @@ model menuType {
 
 model table_loc {
   table_id     Int       @id @default(autoincrement())
-  table_name   String?   @db.VarChar(30)
+  table_name   String    @unique @db.VarChar(30)
   max_capacity Int
   reserves     reserve[]
 }
@@ -71,11 +71,10 @@ model reserveDetail {
   c_id     Int?    // コースID
   quantity Int     @default(1)
 
-  reserve  reserve @relation(fields: [rsv_id], references: [rsv_id])
+  reserve  reserve @relation(fields: [rsv_id], references: [rsv_id], onDelete: Cascade)
   menu     menu?   @relation(fields: [m_id], references: [m_id])
   course   course? @relation(fields: [c_id], references: [c_id])
 }
-
 model course {
   c_id      Int       @id @default(autoincrement())
   c_name    String    @db.VarChar(30)
