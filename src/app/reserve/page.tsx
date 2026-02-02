@@ -32,10 +32,20 @@ export default async function ReservePage() {
     redirect("/login");
   }
 
-  // 2. 認証トークンからユーザーIDを取得 (実際の実装に合わせる)
-  // ここでは仮に '1' としますが、実際はトークンをデコードして取得してください。
-  const userId = await getUserIdFromAuthToken(authToken);
-  //const userId = 1; // 開発用仮ID
+  // 2. 認証トークンからユーザーIDを取得
+  // try-catch で囲むことで、期限切れや改ざんされたトークンによるエラーをキャッチします
+  let userId: number;
+  try {
+    userId = await getUserIdFromAuthToken(authToken);
+
+    // もし関数が null や 0 を返した場合の最終防衛ライン
+    if (!userId) {
+      redirect("/login");
+    }
+  } catch (error) {
+    console.error("認証エラー:", error);
+    redirect("/login");
+  }
 
   // ★修正: データベースからテーブルデータを取得
   const tableData: TableLoc[] = await getAllTableLocs();
