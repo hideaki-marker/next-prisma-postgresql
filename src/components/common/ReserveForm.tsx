@@ -89,6 +89,12 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       return;
     }
 
+    if (!Array.isArray(parsedOrder)) {
+      toast.error("注文データの形式が不正です。");
+      // 必要ならここで localStorage.removeItem("temp_reservation_order") して掃除しても良いですね
+      return;
+    }
+
     const time = formData.get("rsv_time") as string;
     const tableIdStr = formData.get("table_id") as string;
 
