@@ -44,20 +44,21 @@ async function main() {
   }
 
   // --- 3. テストユーザー (users) の作成 ---
-  const hashedPassword = await bcrypt.hash("passwordSA", 10);
-  const users = ["スミス", "アマンダ", "ドワイト", "ローリー"];
-  for (const name of users) {
-    await prisma.users.upsert({
-      where: { name: name },
-      update: {},
-      create: {
-        name: name,
-        password: hashedPassword,
-        created_at: new Date(),
-      },
-    });
+  if (process.env.NODE_ENV !== "production") {
+    const hashedPassword = await bcrypt.hash("passwordSA", 10);
+    const users = ["スミス", "アマンダ", "ドワイト", "ローリー"];
+    for (const name of users) {
+      await prisma.users.upsert({
+        where: { name: name },
+        update: {},
+        create: {
+          name: name,
+          password: hashedPassword,
+          created_at: new Date(),
+        },
+      });
+    }
   }
-
   // --- 4. 管理者 (admin) の作成 ---
   const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
