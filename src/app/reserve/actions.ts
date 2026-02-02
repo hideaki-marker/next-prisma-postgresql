@@ -49,6 +49,7 @@ export async function createReservation(data: ReservationData) {
             // reserve モデルとのリレーション項目名を確認してください（通常 rsv_id か reserve_id）
             rsv_id: newReservation.rsv_id,
             c_id: data.courseId,
+            quantity: 1,
             // 単品(m_id)は空なので、この場合はコースIDだけを入れる
           },
         });
