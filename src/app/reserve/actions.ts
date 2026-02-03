@@ -111,10 +111,10 @@ type ErrorResult = {
 // ★修正: getReservationListの戻り値の型を Union 型として export します
 export type ReservationListResult = SuccessResult | ErrorResult;
 
+//予約リストと予約詳細を取得する
 export async function getReservationList(): Promise<ReservationListResult> {
   try {
     const reservations = await prisma.reserve.findMany({
-      // ... (クエリ内容はそのまま) ...
       // クエリの内容は reservationWithRelations と一致しているため、型の保証にも役立ちます。
       include: {
         users: {
@@ -126,6 +126,19 @@ export async function getReservationList(): Promise<ReservationListResult> {
           select: {
             table_name: true,
             max_capacity: true,
+          },
+        },
+        // ★ここを追加：予約詳細とその先のメニュー/コース名を取得
+        details: {
+          include: {
+            // ★ ここ！「menu_loc」ではなく「menu」に修正
+            menu: {
+              select: { m_name: true },
+            },
+            // ★ ここ！「course_loc」ではなく「course」に修正
+            course: {
+              select: { c_name: true },
+            },
           },
         },
       },
