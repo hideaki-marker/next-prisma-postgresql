@@ -16,11 +16,15 @@ export function getUserIdFromAuthToken(token: string): number {
     const decoded = jwt.verify(token, JWT_SECRET);
 
     // 3. decoded が文字列ではなくオブジェクトであり、かつ id を持っているかチェック
-    if (typeof decoded !== "string" && decoded && "id" in decoded) {
-      return (decoded as any).id as number;
+    if (
+      typeof decoded === "object" &&
+      decoded !== null &&
+      "id" in decoded &&
+      typeof (decoded as Record<string, unknown>).id === "number"
+    ) {
+      return (decoded as Record<string, unknown>).id as number;
     }
-
-    throw new Error("トークンの形式が不正です。");
+    throw new Error("トークンの形式が不正です（IDが数値ではありません）。");
   } catch (error) {
     console.error("トークンの検証に失敗しました:", error);
     throw new Error("認証セッションが切れました。再度ログインしてください。");
