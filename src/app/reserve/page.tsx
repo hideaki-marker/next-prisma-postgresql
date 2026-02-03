@@ -1,12 +1,27 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 // ユーザー情報をトークンから取得する関数 (仮定)
-// import { getUserIdFromAuthToken } from '@/lib/auth';
-import ReserveForm from "@/components/common/ReserveForm"; // 次に作成する予約フォームコンポーネント
-// ★修正: サーバーアクションからテーブル取得関数をインポート
+import { getUserIdFromAuthToken } from "@/lib/auth";
+import ReserveForm from "@/components/common/ReserveForm";
 import { getAllTableLocs } from "./actions";
 import { TableLoc } from "@/type/db";
 
+/**
+ * 予約入力ページ
+ * * クッキーから認証トークンを確認し、未認証の場合はログインページへリダイレクトします。
+ * データベースから予約可能なテーブル情報を取得し、予約フォームへと渡します。
+ * 背景画像に '/reserve.png' を使用した、没入感のあるフルスクリーンレイアウトを提供します。
+ * * @async
+ * @function ReservePage
+ * @returns {Promise<JSX.Element>} 認証チェック済みの予約入力画面
+ * * @example
+ * // 内部フロー:
+ * // 1. Cookieから 'auth_token' を取得
+ * // 2. トークンがない場合は /login へリダイレクト
+ * // 3. ユーザーIDを特定 (現在は仮ID: 1)
+ * // 4. DBから TableLoc[] (テーブル情報) を取得
+ * // 5. ReserveForm コンポーネントにデータを渡してレンダリング
+ */
 export default async function ReservePage() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get("auth_token")?.value;
@@ -17,10 +32,20 @@ export default async function ReservePage() {
     redirect("/login");
   }
 
-  // 2. 認証トークンからユーザーIDを取得 (実際の実装に合わせる)
-  // ここでは仮に '1' としますが、実際はトークンをデコードして取得してください。
-  // const userId = await getUserIdFromAuthToken(authToken);
-  const userId = 1; // 開発用仮ID
+  // 2. 認証トークンからユーザーIDを取得
+  // try-catch で囲むことで、期限切れや改ざんされたトークンによるエラーをキャッチします
+  let userId: number;
+  try {
+    userId = await getUserIdFromAuthToken(authToken);
+
+    // もし関数が null や 0 を返した場合の最終防衛ライン
+    if (!userId) {
+      redirect("/login");
+    }
+  } catch (error) {
+    console.error("認証エラー:", error);
+    redirect("/login");
+  }
 
   // ★修正: データベースからテーブルデータを取得
   const tableData: TableLoc[] = await getAllTableLocs();

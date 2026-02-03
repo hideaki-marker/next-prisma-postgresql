@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -31,41 +31,78 @@ type ReserveFormProps = {
   tableData: TableLoc[];
 };
 
+/**
+ * 予約入力コンポーネント
+ * @param param0
+ * @returns
+ */
 export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
   const router = useRouter();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [person, setPerson] = useState(1);
+  const [orderSummary, setOrderSummary] = useState<string>(""); // 選択中メニュー表示用
+
+  // 画面表示時に localStorage から何のメニューを選んでいるか確認する
+  useEffect(() => {
+    const orderDataJson = localStorage.getItem("temp_reservation_order");
+    if (orderDataJson) {
+      try {
+        const data = JSON.parse(orderDataJson);
+        // コースか単品かで表示を切り分ける（UI用）
+        if (Array.isArray(data) && data.length > 0) {
+          // 1. まずコースがあるか探す
+          const courseItem = data.find((item: any) => item.type === "course");
+
+          if (courseItem) {
+            // コース名があれば表示、なければIDを表示
+            setOrderSummary(
+              `コース予約: ${courseItem.name || `ID: ${courseItem.id}`}`,
+            );
+          } else {
+            // 2. なければ単品メニューとして処理
+            const menuItems = data.filter((item: any) => item.type === "menu");
+            const names = menuItems
+              .map((item: any) => `${item.name} × ${item.quantity}`)
+              .join(", ");
+
+            setOrderSummary(`単品メニュー ${menuItems.length} 点: ${names}`);
+          }
+        }
+      } catch (e) {
+        console.error("注文データのパースに失敗しました:", e);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (formData: FormData) => {
-    // 1. 注文データの取得
     const orderDataJson = localStorage.getItem("temp_reservation_order");
     if (!orderDataJson) {
       toast.error("メニュー注文情報が見つかりません。");
       return;
     }
 
-    // JSONの解析を安全に行う
-    let orderData;
+    let parsedOrder;
     try {
-      orderData = JSON.parse(orderDataJson);
+      parsedOrder = JSON.parse(orderDataJson);
     } catch (e) {
-      console.error("JSON parse error:", e);
-      toast.error(
-        "注文データが壊れています。もう一度メニューを選び直してください。",
-      );
+      toast.error("注文データが壊れています。");
       return;
     }
 
-    // 2. 日時・人数・テーブルの取得
+    if (!Array.isArray(parsedOrder)) {
+      toast.error("注文データの形式が不正です。");
+      // 必要ならここで localStorage.removeItem("temp_reservation_order") して掃除しても良いですね
+      return;
+    }
+
     const time = formData.get("rsv_time") as string;
     const tableIdStr = formData.get("table_id") as string;
 
     if (!date || !time || !tableIdStr) {
-      toast.error("予約情報（日付・時間・テーブル）をすべて入力してください。");
+      toast.error("すべての項目を入力してください。");
       return;
     }
 
-    // 日付と時間を合成
     const [hours, minutes] = time.split(":").map(Number);
     const rsvDate = new Date(date);
     rsvDate.setHours(hours, minutes, 0, 0);
@@ -73,29 +110,40 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
     const personCount = parseInt(formData.get("person") as string);
     const tableId = parseInt(tableIdStr);
 
-    if (Number.isNaN(personCount) || Number.isNaN(tableId)) {
-      toast.error("人数またはテーブルの選択が正しくありません。");
+    if (isNaN(personCount) || isNaN(tableId)) {
+      toast.error("予約人数、またはテーブルの選択が正しくありません。");
       return;
     }
 
-    // バリデーション（テーブル収容人数など）
     const selectedTable = tableData.find((t) => t.table_id === tableId);
     if (
       !selectedTable ||
       personCount < 1 ||
       personCount > selectedTable.max_capacity
     ) {
+      // 名前が取れない場合の予備テキスト（フォールバック）を用意
+      const tableName = selectedTable?.table_name ?? "指定のテーブル";
+
       toast.error(
-        `人数が不正、または${selectedTable?.table_name}の定員を超えています。`,
+        `人数が不正、または${tableName}の定員（${selectedTable?.max_capacity ?? "?"}名）を超えています。`,
       );
       return;
     }
+    // --- ここでバックエンドの形式に合わせてデータを整形 ---
     const result = await createReservation({
       userId,
       rsv_date: rsvDate,
       person: personCount,
       table_id: tableId,
-      orderData: orderData,
+      // localStorageの中身が {courseId: 1} なら courseId に、配列なら orderData に入れる
+      courseId:
+        parsedOrder.find((item: any) => item.type === "course")?.id || null,
+      orderData: parsedOrder
+        .filter((item: any) => item.type === "menu")
+        .map((item: any) => ({
+          m_id: item.id,
+          quantity: item.quantity,
+        })),
     });
 
     if (result.success) {
@@ -103,7 +151,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       toast.success("予約が完了しました！");
       router.push("/reserveList");
     } else {
-      toast.error(result.message || "予約登録中にエラーが発生しました。");
+      toast.error(result.message);
     }
   };
 
@@ -115,13 +163,24 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
       }}
       className="flex-1 bg-white/95 backdrop-blur-sm p-10 rounded-xl shadow-2xl border border-white/20 w-full flex flex-col"
     >
-      {/* 1. タイトル部分を均等配置の外に出す（これで余白が固定されます） */}
       <h2 className="text-2xl font-bold text-white flex items-center justify-center h-20 mb-8 bg-gray-900 rounded-t-xl -mt-10 -mx-10 shadow-inner">
         <span>予約詳細の入力</span>
       </h2>
 
-      {/* 2. 入力項目だけを flex-grow で囲み、ここで余白を均等に分配する */}
-      <div className="flex-grow flex flex-col justify-around min-h-[450px]">
+      <div className="flex-grow flex flex-col justify-around min-h-[500px]">
+        {/* ★ 追加：選択中のメニュー情報を確認用として表示 */}
+        <div className="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300 flex items-center gap-3 mb-4">
+          <Utensils className="text-red-600 h-5 w-5" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase font-bold">
+              選択中のメニュー
+            </p>
+            <p className="text-sm font-medium text-gray-800">
+              {orderSummary || "未選択"}
+            </p>
+          </div>
+        </div>
+
         {/* 予約日付 */}
         <div className="flex flex-col gap-2">
           <label className="text-lg font-medium text-gray-700">予約日</label>
@@ -197,7 +256,9 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
 
         {/* テーブル選択 */}
         <div className="flex flex-col gap-2">
-          <label className="text-lg font-medium text-gray-700">テーブル</label>
+          <label className="text-lg font-medium text-gray-700">
+            テーブル（イタリア都市名）
+          </label>
           <Select name="table_id" required>
             <SelectTrigger className="h-12">
               <SelectValue placeholder="テーブルを選択" />
@@ -205,7 +266,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
             <SelectContent>
               {tableData.map((table) => (
                 <SelectItem key={table.table_id} value={String(table.table_id)}>
-                  {table.table_name} ({table.max_capacity}人席)
+                  {table.table_name} (最大{table.max_capacity}名)
                 </SelectItem>
               ))}
             </SelectContent>
@@ -213,7 +274,6 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
         </div>
       </div>
 
-      {/* ボタンエリア */}
       <div className="space-y-4 mt-10">
         <Button
           type="submit"
