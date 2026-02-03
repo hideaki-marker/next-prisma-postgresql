@@ -90,6 +90,12 @@ const reservationWithRelations = Prisma.validator<Prisma.reserveDefaultArgs>()({
         max_capacity: true,
       },
     },
+    details: {
+      include: {
+        menu: { select: { m_name: true } },
+        course: { select: { c_name: true } },
+      },
+    },
   },
 });
 
@@ -145,9 +151,8 @@ export async function getReservationList(): Promise<ReservationListResult> {
     });
 
     // 成功した場合はデータを返却
-    return { success: true, data: reservations };
+    return { success: true, data: reservations as ReservationWithRelations[] };
   } catch (error) {
-    console.error("予約リスト取得エラー:", error);
     // 失敗時も ReservationListResult 型に従ったオブジェクトを必ず返す
     return {
       success: false,
@@ -157,7 +162,7 @@ export async function getReservationList(): Promise<ReservationListResult> {
 }
 
 export async function deleteReservation(rsvId: number) {
-  console.log(`予約ID ${rsvId} の削除を試行中...`);
+  //console.log(`予約ID ${rsvId} の削除を試行中...`);
   try {
     const deletedReservation = await prisma.reserve.delete({
       where: {
