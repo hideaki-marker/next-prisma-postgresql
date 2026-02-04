@@ -162,15 +162,20 @@ export default function ReserveList({
                         予約日時
                       </dt>
                       <dd className="text-sm font-medium">
-                        {rsv.rsv_date
-                          ? format(
-                              new Date(rsv.rsv_date),
-                              "yyyy年MM月dd日(E) HH:mm",
-                              {
-                                locale: ja,
-                              },
-                            )
-                          : "日時未設定"}
+                        {(() => {
+                          const date = rsv.rsv_date
+                            ? new Date(rsv.rsv_date)
+                            : null;
+
+                          // dateがnull、または無効な日付(isNaN)の場合は「日時未設定」を返す
+                          if (!date || isNaN(date.getTime())) {
+                            return "日時未設定";
+                          }
+
+                          return format(date, "yyyy年MM月dd日(E) HH:mm", {
+                            locale: ja,
+                          });
+                        })()}
                       </dd>
                     </div>
 
