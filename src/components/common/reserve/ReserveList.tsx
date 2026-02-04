@@ -6,7 +6,10 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { deleteReservation } from "@/app/reserve/actions";
+import {
+  deleteReservation,
+  updateReservationStatus,
+} from "@/app/reserve/actions";
 // ★ ReservationWithRelations 型は必要に応じて import/定義してください
 type ReservationWithRelations = any;
 
@@ -34,31 +37,77 @@ export default function ReserveList({
   };
 
   const handleDeleteSelected = async () => {
-    // ... 削除ロジック（省略） ...
-    if (selectedReservationIds.length === 0)
-      return alert("削除する予約を選択してください。");
     if (
-      !confirm(
-        `${selectedReservationIds.length}件の予約を削除してもよろしいですか？\nこの操作は元に戻せません。`,
+      !window.confirm(
+        `${selectedReservationIds.length}件の予約を削除してよろしいですか？`,
       )
     )
       return;
 
     try {
-      // 全ての削除通信が終わるのを待つ
-      await Promise.all(
-        selectedReservationIds.map((id) => deleteReservation(id)),
+      // 全ての結果が出るまで待つ (成功も失敗も受け止める)
+      const results = await Promise.allSettled(
+        selectedReservationIds.map(async (id) => {
+          const result = await deleteReservation(id);
+          if (!result.success) throw new Error(`ID: ${id} の削除失敗`);
+          return id;
+        }),
       );
 
-      // UIを更新
-      setReservations((prevRsvs) =>
-        prevRsvs.filter((rsv) => !selectedReservationIds.includes(rsv.rsv_id)),
+      // 成功したIDだけを抽出
+      const deletedIds = results
+        .filter(
+          (r): r is PromiseFulfilledResult<number> => r.status === "fulfilled",
+        )
+        .map((r) => r.value);
+
+      // 失敗した数をカウント
+      const failedCount = results.filter((r) => r.status === "rejected").length;
+
+      // 成功した分だけ画面から消す
+      setReservations((prev) =>
+        prev.filter((rsv) => !deletedIds.includes(rsv.rsv_id)),
       );
-      setSelectedReservationIds([]);
-      alert("予約が削除されました。");
+
+      // 選択状態も、消えた分だけ解除する
+      setSelectedReservationIds((prev) =>
+        prev.filter((id) => !deletedIds.includes(id)),
+      );
+
+      // 完了報告
+      if (failedCount > 0) {
+        alert(
+          `${deletedIds.length}件削除しました。${failedCount}件の削除に失敗しました。再度お試しください。`,
+        );
+      } else {
+        alert("選択されたすべての予約を削除しました。");
+      }
     } catch (error) {
-      console.error("一括削除エラー:", error);
-      alert("削除処理中にエラーが発生しました。");
+      console.error("一括削除処理中にエラー:", error);
+      alert("予期せぬエラーが発生しました。");
+    }
+  };
+
+  const handleUpdateStatus = async (rsvId: number, newStatus: string) => {
+    try {
+      // サーバーの関数を呼び出し
+      const result = await updateReservationStatus(rsvId, newStatus);
+
+      if (result.success) {
+        // 画面上の状態も更新して、リロードなしで色を変える
+        setReservations((prev) =>
+          prev.map((rsv) =>
+            rsv.rsv_id === rsvId ? { ...rsv, status: newStatus } : rsv,
+          ),
+        );
+      } else {
+        // サーバー側が「失敗」を返した場合（バリデーションエラーなど）
+        alert(result.message || "ステータスの更新に失敗しました。");
+      }
+    } catch (error) {
+      // 通信エラーや予期せぬクラッシュが起きた場合
+      console.error("ステータス更新エラー:", error);
+      alert("通信エラーが発生しました。時間を置いて再度お試しください。");
     }
   };
 
@@ -113,9 +162,15 @@ export default function ReserveList({
                         予約日時
                       </dt>
                       <dd className="text-sm font-medium">
-                        {format(rsv.rsv_date, "yyyy年MM月dd日(E) HH:mm", {
-                          locale: ja,
-                        })}
+                        {rsv.rsv_date
+                          ? format(
+                              new Date(rsv.rsv_date),
+                              "yyyy年MM月dd日(E) HH:mm",
+                              {
+                                locale: ja,
+                              },
+                            )
+                          : "日時未設定"}
                       </dd>
                     </div>
 
@@ -124,7 +179,9 @@ export default function ReserveList({
                       <dt className="text-xs font-semibold uppercase text-gray-500">
                         予約者
                       </dt>
-                      <dd className="text-sm">{rsv.users.name}</dd>
+                      <dd className="text-sm">
+                        {rsv.users?.name ?? "退会済みユーザー"}
+                      </dd>{" "}
                     </div>
 
                     {/* 人数 */}
@@ -141,8 +198,8 @@ export default function ReserveList({
                         テーブル
                       </dt>
                       <dd className="text-sm">
-                        {rsv.table_loc.table_name} ({rsv.table_loc.max_capacity}
-                        名席)
+                        {rsv.table_loc?.table_name ?? "テーブル未設定"}(
+                        {rsv.table_loc?.max_capacity ?? "-"}名)
                       </dd>
                     </div>
                     {/* 注文内容（メニュー/コース名） */}
@@ -173,6 +230,44 @@ export default function ReserveList({
                       </dd>
                     </div>
                   </dl>
+                  <div className="flex items-center gap-3">
+                    {/* ステータスバッジ */}
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-bold ${
+                        rsv.status === "visited"
+                          ? "bg-green-500 text-white"
+                          : rsv.status === "cancelled"
+                            ? "bg-gray-400 text-white"
+                            : "bg-yellow-500 text-white"
+                      }`}
+                    >
+                      {rsv.status === "visited"
+                        ? "来店済み"
+                        : rsv.status === "cancelled"
+                          ? "キャンセル"
+                          : "予約中"}
+                    </span>
+                  </div>
+
+                  {/* ボタンエリア */}
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => handleUpdateStatus(rsv.rsv_id, "visited")}
+                      disabled={rsv.status === "visited"}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+                    >
+                      来店完了
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleUpdateStatus(rsv.rsv_id, "cancelled")
+                      }
+                      disabled={rsv.status === "cancelled"}
+                      className="border border-red-500 text-red-500 hover:bg-red-50 px-3 py-1 rounded text-sm disabled:opacity-50"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
