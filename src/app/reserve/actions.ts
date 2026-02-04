@@ -1,9 +1,9 @@
 "use server";
 
+import prisma from "@/lib/prisma";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { TableLoc } from "@/type/db";
-
-const prisma = new PrismaClient();
+import { revalidatePath } from "next/cache";
 
 // ReserveFormから渡されるデータの型
 type ReservationData = {
@@ -205,5 +205,34 @@ export async function getAllTableLocs(): Promise<TableLoc[]> {
     console.error("テーブルデータ取得エラー:", error);
     // エラー時は空の配列を返すか、例外をスローします（ここでは空配列を返す）
     return [];
+  }
+}
+
+/**
+ * 予約のステータスを更新する
+ */
+export async function updateReservationStatus(
+  rsvId: number,
+  newStatus: string,
+) {
+  try {
+    const updated = await prisma.reserve.update({
+      where: {
+        rsv_id: rsvId,
+      },
+      data: {
+        status: newStatus,
+      },
+    });
+
+    console.log(`ステータス更新成功: ID ${rsvId} -> ${newStatus}`);
+
+    // 画面のキャッシュを更新して最新の状態を表示させる
+    revalidatePath("/reserveList");
+
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("ステータス更新エラー:", error);
+    return { success: false, message: "ステータスの更新に失敗しました。" };
   }
 }
