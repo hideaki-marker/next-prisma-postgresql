@@ -60,6 +60,8 @@ model reserve {
   table_id  Int
   table_loc table_loc @relation(fields: [table_id], references: [table_id])
   app_date  DateTime  @default(now()) @db.Timestamp(6)
+  // デフォルトを 'pending' (予約中) にしておくと、新規予約時に自動で設定されます
+  status    String   @default("pending")
   details   reserveDetail[]
 }
 
