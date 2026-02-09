@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -10,6 +10,8 @@ import {
   deleteReservation,
   updateReservationStatus,
 } from "@/app/reserve/actions";
+import ReturnButton from "../ReturnButton";
+
 // ★ ReservationWithRelations 型は必要に応じて import/定義してください
 type ReservationWithRelations = any;
 
@@ -24,6 +26,14 @@ export default function ReserveList({
   const [selectedReservationIds, setSelectedReservationIds] = useState<
     number[]
   >([]);
+
+  // ★★★ ここにマウント状態を管理するステートを追加 ★★★
+  const [isMounted, setIsMounted] = useState(false);
+
+  // マウント時に true に変更する
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // ★★★ handleCheckboxChange, handleDeleteSelected 関数もここに定義する ★★★
   const handleCheckboxChange = (rsvId: number, isChecked: boolean) => {
@@ -162,20 +172,21 @@ export default function ReserveList({
                         予約日時
                       </dt>
                       <dd className="text-sm font-medium">
-                        {(() => {
-                          const date = rsv.rsv_date
-                            ? new Date(rsv.rsv_date)
-                            : null;
-
-                          // dateがnull、または無効な日付(isNaN)の場合は「日時未設定」を返す
-                          if (!date || isNaN(date.getTime())) {
-                            return "日時未設定";
-                          }
-
-                          return format(date, "yyyy年MM月dd日(E) HH:mm", {
-                            locale: ja,
-                          });
-                        })()}
+                        {isMounted
+                          ? // ブラウザ側で実行される表示
+                            (() => {
+                              const date = rsv.rsv_date
+                                ? new Date(rsv.rsv_date)
+                                : null;
+                              if (!date || isNaN(date.getTime())) {
+                                return "日時未設定";
+                              }
+                              return format(date, "yyyy年MM月dd日(E) HH:mm", {
+                                locale: ja,
+                              });
+                            })()
+                          : // サーバーレンダリング時（ブラウザで読み込まれる瞬間まで）の表示
+                            "---"}
                       </dd>
                     </div>
 
@@ -289,16 +300,7 @@ export default function ReserveList({
             </div>
 
             {/* 戻るボタン */}
-            <a href="/adminIndex">
-              <div className="flex items-center justify-center mb-16">
-                <Button
-                  variant="outline"
-                  className="bg-black text-white hover:bg-gray-800 hover:text-white text-2xl !px-12 !py-6"
-                >
-                  戻る
-                </Button>
-              </div>
-            </a>
+            <ReturnButton isLoggedIn={true} returnUrl="/adminIndex" />
           </div>
         )}
       </div>
