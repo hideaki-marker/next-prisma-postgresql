@@ -31,6 +31,7 @@ model menu {
   orderFlg Boolean? @default(true)
   price    Int
   t_id     Int      @db.SmallInt
+  image_url     String?
   menuType menuType @relation(fields: [t_id], references: [t_id])
   courseCtl courseCtl[] 
   reserveDetail reserveDetail[] // リレーションの逆参照用
