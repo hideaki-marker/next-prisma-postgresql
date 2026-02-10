@@ -14,9 +14,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "9000",
+        protocol:
+          (process.env.NEXT_PUBLIC_MINIO_PROTOCOL as "http" | "https") ||
+          "http",
+        hostname: process.env.NEXT_PUBLIC_MINIO_HOSTNAME || "localhost",
+        port: process.env.NEXT_PUBLIC_MINIO_PORT || "9000",
         pathname: "/restaurant-photos/**",
       },
     ],
