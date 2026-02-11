@@ -2,15 +2,14 @@ import "server-only"; // これを入れると、誤ってクライアント側�
 import * as Minio from "minio";
 
 export const minioClient = new Minio.Client({
-  endPoint: "minio", // Docker外(ホスト)からの場合は localhost
-  port: 9000,
-  useSSL: false,
-  accessKey: "minioadmin",
-  secretKey: "minioadmin",
+  endPoint: process.env.MINIO_ENDPOINT || "minio",
+  port: parseInt(process.env.MINIO_PORT || "9000", 10),
+  useSSL: process.env.MINIO_USE_SSL === "true",
+  accessKey: process.env.MINIO_ACCESS_KEY || "minioadmin",
+  secretKey: process.env.MINIO_SECRET_KEY || "minioadmin",
 });
 
-export const BUCKET_NAME = "restaurant-photos";
-
+export const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "restaurant-photos";
 // --- ここから初期設定コード ---
 export const initMinio = async () => {
   try {
@@ -36,5 +35,6 @@ export const initMinio = async () => {
     }
   } catch (err) {
     console.error("MinIO初期設定エラー:", err);
+    throw err;
   }
 };
