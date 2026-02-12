@@ -10,7 +10,11 @@ export const minioClient = new Minio.Client({
 });
 
 export const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "restaurant-photos";
-// --- ここから初期設定コード ---
+
+/**
+ * MinIOの初期設定（バケット作成）を行う関数
+ * @returns {Promise<boolean>} 成功した場合は true, 失敗した場合は false
+ */
 export const initMinio = async () => {
   try {
     const exists = await minioClient.bucketExists(BUCKET_NAME);
