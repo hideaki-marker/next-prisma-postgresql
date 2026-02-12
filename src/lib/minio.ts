@@ -15,7 +15,7 @@ export const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "restaurant-photos";
  * MinIOの初期設定（バケット作成）を行う関数
  * @returns {Promise<boolean>} 成功した場合は true, 失敗した場合は false
  */
-export const initMinio = async () => {
+export const initMinio = async (): Promise<boolean> => {
   try {
     const exists = await minioClient.bucketExists(BUCKET_NAME);
     if (!exists) {
@@ -37,8 +37,9 @@ export const initMinio = async () => {
       };
       await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy));
     }
+    return true;
   } catch (err) {
     console.error("MinIO初期設定エラー:", err);
-    throw err;
+    return false;
   }
 };
