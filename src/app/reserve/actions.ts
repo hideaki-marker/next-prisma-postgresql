@@ -1,9 +1,9 @@
 "use server";
 
+import prisma from "@/lib/prisma";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { TableLoc } from "@/type/db";
-
-const prisma = new PrismaClient();
+import { revalidatePath } from "next/cache";
 
 // ReserveFormから渡されるデータの型
 type ReservationData = {
@@ -90,6 +90,12 @@ const reservationWithRelations = Prisma.validator<Prisma.reserveDefaultArgs>()({
         max_capacity: true,
       },
     },
+    details: {
+      include: {
+        menu: { select: { m_name: true } },
+        course: { select: { c_name: true } },
+      },
+    },
   },
 });
 
@@ -111,10 +117,10 @@ type ErrorResult = {
 // ★修正: getReservationListの戻り値の型を Union 型として export します
 export type ReservationListResult = SuccessResult | ErrorResult;
 
+//予約リストと予約詳細を取得する
 export async function getReservationList(): Promise<ReservationListResult> {
   try {
     const reservations = await prisma.reserve.findMany({
-      // ... (クエリ内容はそのまま) ...
       // クエリの内容は reservationWithRelations と一致しているため、型の保証にも役立ちます。
       include: {
         users: {
@@ -128,13 +134,25 @@ export async function getReservationList(): Promise<ReservationListResult> {
             max_capacity: true,
           },
         },
+        // ★ここを追加：予約詳細とその先のメニュー/コース名を取得
+        details: {
+          include: {
+            // ★ ここ！「menu_loc」ではなく「menu」に修正
+            menu: {
+              select: { m_name: true },
+            },
+            // ★ ここ！「course_loc」ではなく「course」に修正
+            course: {
+              select: { c_name: true },
+            },
+          },
+        },
       },
     });
 
     // 成功した場合はデータを返却
-    return { success: true, data: reservations };
+    return { success: true, data: reservations as ReservationWithRelations[] };
   } catch (error) {
-    console.error("予約リスト取得エラー:", error);
     // 失敗時も ReservationListResult 型に従ったオブジェクトを必ず返す
     return {
       success: false,
@@ -144,7 +162,7 @@ export async function getReservationList(): Promise<ReservationListResult> {
 }
 
 export async function deleteReservation(rsvId: number) {
-  console.log(`予約ID ${rsvId} の削除を試行中...`);
+  //console.log(`予約ID ${rsvId} の削除を試行中...`);
   try {
     const deletedReservation = await prisma.reserve.delete({
       where: {
@@ -187,5 +205,34 @@ export async function getAllTableLocs(): Promise<TableLoc[]> {
     console.error("テーブルデータ取得エラー:", error);
     // エラー時は空の配列を返すか、例外をスローします（ここでは空配列を返す）
     return [];
+  }
+}
+
+/**
+ * 予約のステータスを更新する
+ */
+export async function updateReservationStatus(
+  rsvId: number,
+  newStatus: string,
+) {
+  try {
+    const updated = await prisma.reserve.update({
+      where: {
+        rsv_id: rsvId,
+      },
+      data: {
+        status: newStatus,
+      },
+    });
+
+    console.log(`ステータス更新成功: ID ${rsvId} -> ${newStatus}`);
+
+    // 画面のキャッシュを更新して最新の状態を表示させる
+    revalidatePath("/reserveList");
+
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error("ステータス更新エラー:", error);
+    return { success: false, message: "ステータスの更新に失敗しました。" };
   }
 }

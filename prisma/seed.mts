@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import pkg from "@prisma/client";
+const { PrismaClient } = pkg;
 import bcrypt from "bcryptjs"; // ESM形式に合わせて修正
 
 const prisma = new PrismaClient();
