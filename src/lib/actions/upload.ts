@@ -55,16 +55,21 @@ export async function uploadMenuImage(formData: FormData): Promise<{
     }
 
     // ファイル名をユニークにする
-    const fileName = `temp_${randomUUID()}${getSafeExtension(file.name)}`;
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const optimizedBuffer = await sharp(buffer)
+    const optimizedBuffer = await sharp(buffer, {
+      animated: true, // ✅ ここ！「読み込み時」に animated を指定するのが正解！
+    })
       .resize({
         width: 1200, // PC用にある程度大きく
         withoutEnlargement: true, // 元画像が小さい場合は無理に拡大しない
       })
-      .webp({ quality: 85 }) // 画質と軽さの黄金比
+      .webp({
+        quality: 85,
+      }) // 画質と軽さの黄金比
       .toBuffer();
 
+    const fileName = `temp_${randomUUID()}.webp`;
     // 3. MinIOにアップロード
     await minioClient.putObject(
       BUCKET_NAME,
