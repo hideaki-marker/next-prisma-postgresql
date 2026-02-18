@@ -41,19 +41,19 @@ const getMinioUrl = (fileName: string | null) => {
   return `${protocol}://${host}:${port}/${bucket}/${fileName}`;
 };
 
-// どのメニューIDの画像が読み込み失敗したかを保存するリスト
-const [errorImages, setErrorImages] = useState<Set<number>>(new Set());
-
-const handleImageError = (m_id: number) => {
-  setErrorImages((prev) => new Set(prev).add(m_id));
-};
-
 export default function MenuOrderControls({
   menuTypes,
   isLoggedIn,
   orders,
   setOrders,
 }: MenuOrderProps) {
+  // どのメニューIDの画像が読み込み失敗したかを保存するリスト
+  const [errorImages, setErrorImages] = useState<Set<number>>(new Set());
+
+  const handleImageError = (m_id: number) => {
+    setErrorImages((prev) => new Set(prev).add(m_id));
+  };
+
   // 数量を変更する関数（menu- というプレフィックスを付けて管理）
   const handleQuantityChange = (m_id: number, delta: number) => {
     const key = `menu-${m_id}`;
