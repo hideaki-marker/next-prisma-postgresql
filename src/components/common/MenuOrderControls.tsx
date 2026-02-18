@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import ReturnButton from "./ReturnButton";
+import { useState } from "react";
 
 // 型定義（変更なし）
 type MenuItem = {
@@ -38,6 +39,13 @@ const getMinioUrl = (fileName: string | null) => {
     process.env.NEXT_PUBLIC_MINIO_BUCKET_NAME || "restaurant-photos";
 
   return `${protocol}://${host}:${port}/${bucket}/${fileName}`;
+};
+
+// どのメニューIDの画像が読み込み失敗したかを保存するリスト
+const [errorImages, setErrorImages] = useState<Set<number>>(new Set());
+
+const handleImageError = (m_id: number) => {
+  setErrorImages((prev) => new Set(prev).add(m_id));
 };
 
 export default function MenuOrderControls({
@@ -84,21 +92,23 @@ export default function MenuOrderControls({
                     {/* 左側：画像エリア（onErrorを削除し事前に決定） */}
                     <div className="relative w-2/5 h-full overflow-hidden bg-[#F9F7F5]">
                       <Image
-                        src={getMinioUrl(menuItem.image_url)}
+                        // ✅ もし読み込み失敗リストに入ってたら、フォールバック画像を表示
+                        src={
+                          errorImages.has(menuItem.m_id)
+                            ? "/file.svg"
+                            : getMinioUrl(menuItem.image_url)
+                        }
                         alt={menuItem.m_name}
                         fill
                         // ✅ sizes をもっと具体的に！
                         // 「PC（768px以上）なら 20vw（画面幅の1/5）、スマホなら 40vw で表示する」という指示
                         sizes="(max-width: 768px) 40vw, 20vw"
-                        unoptimized={true}
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        unoptimized={true}
                         // PCでの「高画質感」を出すために優先度を上げる（任意）
                         priority={menuItem.m_id <= 4}
-                        onLoadingComplete={(result) => {
-                          if (result.naturalWidth === 0) {
-                            <p>画像が読み込めませんでした</p>;
-                          }
-                        }}
+                        // ✅ 読み込みに失敗したら、失敗リストにIDをぶち込む！
+                        onError={() => handleImageError(menuItem.m_id)}
                       />
                     </div>
 
