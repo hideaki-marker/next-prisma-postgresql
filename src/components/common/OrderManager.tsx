@@ -27,7 +27,6 @@ export default function OrderManager({
 
     try {
       // 💡 ステップ2: ユーザーに「処理してる感」を出すために少し待つ
-      // 300ms〜500msくらいあると、人間は「あ、動いてる」って認識しやすいよ✨
       await new Promise((r) => setTimeout(r, 300));
 
       // 💡 ステップ3: 実際の処理
@@ -40,7 +39,7 @@ export default function OrderManager({
       // 💡 ステップ4: 基本は router.push で画面が消えるけど、
       // 万が一ページに残った時のために isLoading を false に戻す
       // ※ 遷移が始まるとこのコンポーネント自体が消えるから、実質「出しっぱなし」にできる！
-      // setIsLoading(false); // あえてコメントアウトするか、遷移後に戻る設定にする
+      setIsLoading(false); // あえてコメントアウトするか、遷移後に戻る設定にする
     }
   };
 
