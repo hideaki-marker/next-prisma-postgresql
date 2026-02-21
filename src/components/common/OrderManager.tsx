@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import CourseOrderControls from "./CourseOrderControls";
 import MenuOrderControls from "./MenuOrderControls";
 import { ShoppingCart, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { TransitionButton } from "./TransitionButton";
@@ -20,18 +19,29 @@ export default function OrderManager({
   const [orders, setOrders] = useState<{ [key: string]: number }>({});
   const router = useRouter();
 
-  const [isPending, startTransition] = useTransition();
-  const handleReserveWithLoading = async () => {
-    // startTransition で包むのがポイント！
-    startTransition(async () => {
-      // 1. localStorage への保存（これは一瞬）
-      // handleReserve の中身をここに直接書くか、呼び出す
-      await new Promise((r) => setTimeout(r, 300));
-      await handleReserve();
+  const [isLoading, setIsLoading] = useState(false);
 
-      // 2. この handleReserve の中で router.push("/reserve") が走れば、
-      // 次のページが表示されるまで isPending が true のままになる（はず！）
-    });
+  const handleReserveWithLoading = async () => {
+    // 💡 ステップ1: 自分の手でローディングをONにする！
+    setIsLoading(true);
+
+    try {
+      // 💡 ステップ2: ユーザーに「処理してる感」を出すために少し待つ
+      // 300ms〜500msくらいあると、人間は「あ、動いてる」って認識しやすいよ✨
+      await new Promise((r) => setTimeout(r, 300));
+
+      // 💡 ステップ3: 実際の処理
+      await handleReserve();
+    } catch (error) {
+      console.error(error);
+      // エラーの時だけ false に戻す（遷移に失敗した時用）
+      setIsLoading(false);
+    } finally {
+      // 💡 ステップ4: 基本は router.push で画面が消えるけど、
+      // 万が一ページに残った時のために isLoading を false に戻す
+      // ※ 遷移が始まるとこのコンポーネント自体が消えるから、実質「出しっぱなし」にできる！
+      // setIsLoading(false); // あえてコメントアウトするか、遷移後に戻る設定にする
+    }
   };
 
   // 注文の有無を確認
@@ -125,11 +135,11 @@ export default function OrderManager({
         {isLoggedIn ? (
           <Button
             size="lg"
-            disabled={isPending}
+            disabled={isLoading}
             onClick={handleReserveWithLoading}
             className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
           >
-            {isPending ? (
+            {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 <span>送信中...</span>
