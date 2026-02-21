@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import CourseOrderControls from "./CourseOrderControls";
 import MenuOrderControls from "./MenuOrderControls";
 import { ShoppingCart, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { TransitionButton } from "./TransitionButton";
 
 export default function OrderManager({
   menuType,
@@ -18,11 +20,25 @@ export default function OrderManager({
   const [orders, setOrders] = useState<{ [key: string]: number }>({});
   const router = useRouter();
 
+  const [isPending, startTransition] = useTransition();
+  const handleReserveWithLoading = async () => {
+    // startTransition で包むのがポイント！
+    startTransition(async () => {
+      // 1. localStorage への保存（これは一瞬）
+      // handleReserve の中身をここに直接書くか、呼び出す
+      await new Promise((r) => setTimeout(r, 300));
+      await handleReserve();
+
+      // 2. この handleReserve の中で router.push("/reserve") が走れば、
+      // 次のページが表示されるまで isPending が true のままになる（はず！）
+    });
+  };
+
   // 注文の有無を確認
   const hasOrder = Object.values(orders).some((q) => q > 0);
 
   // 予約処理
-  const handleReserve = () => {
+  const handleReserve = async () => {
     const orderData = Object.entries(orders)
       .filter(([, quantity]) => quantity > 0)
       .map(([key, quantity]) => {
@@ -48,7 +64,7 @@ export default function OrderManager({
     // 保存と遷移を try-catch で囲む
     try {
       localStorage.setItem("temp_reservation_order", JSON.stringify(orderData));
-      router.push("/reserve");
+      await router.push("/reserve");
     } catch (error) {
       console.error("Failed to save order to localStorage:", error);
       // Consider showing user feedback here
@@ -109,22 +125,32 @@ export default function OrderManager({
         {isLoggedIn ? (
           <Button
             size="lg"
-            onClick={handleReserve}
+            disabled={isPending}
+            onClick={handleReserveWithLoading}
             className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
           >
-            <ShoppingCart size={18} />
-            <span>注文を確定して予約へ</span>
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span>送信中...</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart size={18} />
+                <span>注文を確定して予約へ</span>
+              </>
+            )}
           </Button>
         ) : (
-          <Link href="/login">
-            <Button
-              size="lg"
-              className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
-            >
-              <LogIn size={18} />
-              <span>ログインして予約へ</span>
-            </Button>
-          </Link>
+          <TransitionButton
+            href="/login"
+            loadingText="ログイン画面へ..."
+            size="lg"
+            className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <LogIn size={18} />
+            <span>ログインして予約へ</span>
+          </TransitionButton>
         )}
       </div>
     </>
