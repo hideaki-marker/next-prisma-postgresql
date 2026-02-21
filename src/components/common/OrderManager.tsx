@@ -5,8 +5,9 @@ import CourseOrderControls from "./CourseOrderControls";
 import MenuOrderControls from "./MenuOrderControls";
 import { ShoppingCart, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { TransitionButton } from "./TransitionButton";
 
 export default function OrderManager({
   menuType,
@@ -18,11 +19,35 @@ export default function OrderManager({
   const [orders, setOrders] = useState<{ [key: string]: number }>({});
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleReserveWithLoading = async () => {
+    // 💡 ステップ1: 自分の手でローディングをONにする！
+    setIsLoading(true);
+
+    try {
+      // 💡 ステップ2: ユーザーに「処理してる感」を出すために少し待つ
+      await new Promise((r) => setTimeout(r, 300));
+
+      // 💡 ステップ3: 実際の処理
+      await handleReserve();
+    } catch (error) {
+      console.error(error);
+      // エラーの時だけ false に戻す（遷移に失敗した時用）
+      setIsLoading(false);
+    } finally {
+      // 💡 ステップ4: 基本は router.push で画面が消えるけど、
+      // 万が一ページに残った時のために isLoading を false に戻す
+      // ※ 遷移が始まるとこのコンポーネント自体が消えるから、実質「出しっぱなし」にできる！
+      setIsLoading(false); // あえてコメントアウトするか、遷移後に戻る設定にする
+    }
+  };
+
   // 注文の有無を確認
   const hasOrder = Object.values(orders).some((q) => q > 0);
 
   // 予約処理
-  const handleReserve = () => {
+  const handleReserve = async () => {
     const orderData = Object.entries(orders)
       .filter(([, quantity]) => quantity > 0)
       .map(([key, quantity]) => {
@@ -48,7 +73,7 @@ export default function OrderManager({
     // 保存と遷移を try-catch で囲む
     try {
       localStorage.setItem("temp_reservation_order", JSON.stringify(orderData));
-      router.push("/reserve");
+      await router.push("/reserve");
     } catch (error) {
       console.error("Failed to save order to localStorage:", error);
       // Consider showing user feedback here
@@ -109,22 +134,32 @@ export default function OrderManager({
         {isLoggedIn ? (
           <Button
             size="lg"
-            onClick={handleReserve}
+            disabled={isLoading}
+            onClick={handleReserveWithLoading}
             className="bg-[#D32F2F] hover:bg-[#B71C1C] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
           >
-            <ShoppingCart size={18} />
-            <span>注文を確定して予約へ</span>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span>送信中...</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart size={18} />
+                <span>注文を確定して予約へ</span>
+              </>
+            )}
           </Button>
         ) : (
-          <Link href="/login">
-            <Button
-              size="lg"
-              className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
-            >
-              <LogIn size={18} />
-              <span>ログインして予約へ</span>
-            </Button>
-          </Link>
+          <TransitionButton
+            href="/login"
+            loadingText="ログイン画面へ..."
+            size="lg"
+            className="bg-[#8B5E3C] hover:bg-[#4A2C2A] text-white px-8 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <LogIn size={18} />
+            <span>ログインして予約へ</span>
+          </TransitionButton>
         )}
       </div>
     </>
