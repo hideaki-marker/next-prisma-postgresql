@@ -42,7 +42,6 @@ export function LoginForm({
   submitButtonClassName = "bg-[#D32F2F] hover:bg-[#B71C1C]",
   children,
 }: LoginFormBaseProps) {
-  console.log("LoginFormの中の messageType:", messageType);
   return (
     <Card className="w-full max-w-sm mx-auto shadow-lg">
       <CardHeader className="text-center">
@@ -56,10 +55,15 @@ export function LoginForm({
         <form onSubmit={onSubmit} className="space-y-4">
           {/* ユーザー名入力 */}
           <div className="space-y-1">
+            <label htmlFor="name" className="sr-only">
+              ユーザー名
+            </label>
             <Input
+              id="name"
               type="text"
               {...register("name", { required: "ユーザー名は必須です" })}
               placeholder="ユーザー名"
+              aria-invalid={errors.name ? "true" : "false"}
             />
             {errors.name && (
               <p className="text-red-500 text-xs ml-1">
@@ -67,21 +71,24 @@ export function LoginForm({
               </p>
             )}
           </div>
-
           {/* パスワード入力 */}
           <div className="space-y-1">
+            <label htmlFor="password" className="sr-only">
+              パスワード
+            </label>
             <Input
+              id="password"
               type="password"
               {...register("password", { required: "パスワードは必須です" })}
               placeholder="パスワード"
+              aria-invalid={errors.password ? "true" : "false"}
             />
             {errors.password && (
               <p className="text-red-500 text-xs ml-1">
                 {errors.password.message as string}
               </p>
             )}
-          </div>
-
+          </div>{" "}
           {/* ログイン全体のエラー表示 (お客様ログインのAlertを流用) */}
           {message && (
             <Alert
@@ -101,7 +108,6 @@ export function LoginForm({
               <AlertDescription>{message}</AlertDescription>
             </Alert>
           )}
-
           {/* 送信ボタン */}
           <Button
             type="submit"
