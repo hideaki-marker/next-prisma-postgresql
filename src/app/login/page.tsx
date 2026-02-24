@@ -37,7 +37,11 @@ export default function LoginPage() {
         credentials: "include", // ★この行を追加
       });
       if (response.redirected) {
-        // API側でリダイレクトが成功した場合、クライアント側では何もしない
+        // 💡 もしサーバー側でリダイレクトが発生したら、そのURLへスムーズに飛ばす
+        setMessageType("success");
+        setMessage("リダイレクト中...");
+        router.push(response.url);
+        return; // ここで処理を終了させる
       } else if (response.ok) {
         // ログイン成功時のメッセージを表示
         setMessage("ログインに成功しました！");
@@ -50,32 +54,23 @@ export default function LoginPage() {
         setTimeout(() => {
           router.push("/myPage");
         }, 2000);
+        return;
       } else {
         // ログイン失敗時のエラーメッセージ処理
         const errorData = await response.json();
         setMessage(errorData.message || "ログインに失敗しました。");
         setMessageType("error");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("ログイン中にエラーが発生しました:", error);
       setMessage("サーバーエラーが発生しました。");
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 bg-cover bg-center bg-no-repeat bg-[url('/NewCustomerRegistration.png')]">
       {/* 元のフォームを囲む div を Card コンポーネントに置き換える！ */}
-      {message && (
-        <div className="fixed top-5 right-5 z-50 p-4 bg-white border shadow-xl rounded-lg">
-          <p>
-            現在のmessageTypeは:{" "}
-            <span className="font-bold text-blue-600">{messageType}</span>
-          </p>
-          <p>現在のmessageは: {message}</p>
-        </div>
-      )}
       <LoginForm
         title="🔐 ログイン"
         register={register}
