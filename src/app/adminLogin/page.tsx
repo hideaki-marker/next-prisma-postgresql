@@ -74,28 +74,23 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f4f4f4",
-      }}
-    >
-      <LoginForm
-        title="管理者ページログイン"
-        description="ログイン情報を入力してください"
-        submitButtonClassName="bg-green-700 hover:bg-green-800"
-        register={register}
-        errors={errors}
-        onSubmit={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-        message={message}
-        messageType={messageType}
-      >
-        <ReturnButton isLoggedIn={isLoggedIn} />
-      </LoginForm>
+    <div className="relative flex items-center justify-center min-h-screen w-full bg-cover bg-center bg-no-repeat bg-[url('/Kitchen.png')]">
+      <div className="absolute inset-0 bg-white/50 backdrop-blur-[4px] z-10" />
+      <div className="relative z-20 w-full max-w-md px-4">
+        <LoginForm
+          title="管理者ページログイン"
+          description="ログイン情報を入力してください"
+          submitButtonClassName="bg-green-700 hover:bg-green-800"
+          register={register}
+          errors={errors}
+          onSubmit={handleSubmit(onSubmit)}
+          isLoading={isLoading}
+          message={message}
+          messageType={messageType}
+        >
+          <ReturnButton isLoggedIn={isLoggedIn} />
+        </LoginForm>
+      </div>
     </div>
   );
 }
