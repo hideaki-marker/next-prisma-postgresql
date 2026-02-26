@@ -44,11 +44,15 @@ export function LoginForm({
 }: LoginFormBaseProps) {
   return (
     <Card className="w-full max-w-sm mx-auto shadow-lg">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">
+      <CardHeader className="text-center bg-black rounded-t-lg py-8 mb-4">
+        <CardTitle className="text-2xl text-white font-bold tracking-tight">
           {title}
         </CardTitle>
-        {description && <CardDescription>{description}</CardDescription>}
+        {description && (
+          <CardDescription className="text-gray-300">
+            {description}
+          </CardDescription>
+        )}
       </CardHeader>
 
       <CardContent>
