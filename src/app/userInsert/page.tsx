@@ -1,49 +1,64 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Loader2, UserPlus } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form"; // 💡 追加
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Loader2, UserPlus } from "lucide-react";
+import { toast } from "sonner";
+
+type UserRegistrationData = {
+  name: string;
+  password: string;
+};
 
 /**
  * 新規お客様登録ページコンポーネント
  * @description shadcn/uiのCardを使用し、縦長で視認性の高いフォームを提供します。
  */
 export default function UserInsertPage() {
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false); // ログイン画面への遷移用
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 💡 useForm の準備
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserRegistrationData>();
+
+  // 💡 onSubmit の引数が data (入力内容) に変わるよ
+  const onSubmit = async (data: UserRegistrationData) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/user/insert', {
-        method: 'POST',
+      const response = await fetch("/api/user/insert", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, password }),
+        body: JSON.stringify(data), // 💡 data をそのまま送ればOK
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        toast.success('ユーザー登録が完了しました！');
-        router.push('/login'); // ログインページにリダイレクト
+        toast.success("ユーザー登録が完了しました！");
+        router.push("/login"); // ログインページにリダイレクト
       } else {
-        toast.error('ユーザー登録に失敗しました。');
+        toast.error("ユーザー登録に失敗しました。");
       }
     } catch (error) {
-      toast.error('サーバーエラーが発生しました。');
-      console.error('ユーザー登録中にエラーが発生しました:', error);
+      toast.error("サーバーエラーが発生しました。");
+      console.error("ユーザー登録中にエラーが発生しました:", error);
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +67,7 @@ export default function UserInsertPage() {
   // ログイン画面へ遷移する関数
   const handleGoToLogin = () => {
     setIsNavigating(true);
-    router.push('/login');
+    router.push("/login");
   };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4 bg-[url('/NewCustomerRegistration.png')] bg-cover bg-center">
@@ -66,39 +81,66 @@ export default function UserInsertPage() {
             <CardTitle className="text-2xl font-bold tracking-tight">
               新規お客様登録
             </CardTitle>
-            <p className="text-white/70 text-sm">情報を入力してアカウントを作成してください</p>
+            <p className="text-white/70 text-sm">
+              情報を入力してアカウントを作成してください
+            </p>
           </div>
         </CardHeader>
 
         <CardContent className="pt-10 px-8">
-          <form id="user-insert-form" onSubmit={handleSubmit} className="space-y-8">
+          <form
+            id="user-insert-form"
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-8"
+          >
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-semibold text-gray-600 ml-1">
+              <Label
+                htmlFor="name"
+                className="text-sm font-semibold text-gray-600 ml-1"
+              >
                 ユーザー名
               </Label>
               <Input
                 id="name"
                 type="text"
                 placeholder="名前を入力してください"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register("name", { required: "ユーザー名は必須です" })} // 💡 これだけで OK！
                 className="h-12 border-gray-200 focus:ring-[#4A2C2A] focus:border-[#4A2C2A]"
                 required
               />
+              {/* 💡 エラーメッセージの表示 */}
+              {errors.name && (
+                <p className="text-red-500 text-xs ml-1">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-gray-600 ml-1">
+              <Label
+                htmlFor="password"
+                className="text-sm font-semibold text-gray-600 ml-1"
+              >
                 パスワード
               </Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password", {
+                  required: "パスワードは必須です",
+                  minLength: {
+                    value: 6,
+                    message: "6文字以上で入力してください",
+                  },
+                })}
                 className="h-12 border-gray-200 focus:ring-[#4A2C2A] focus:border-[#4A2C2A]"
                 required
               />
+              {errors.password && (
+                <p className="text-red-500 text-xs ml-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
           </form>
         </CardContent>
@@ -114,13 +156,13 @@ export default function UserInsertPage() {
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              'アカウントを登録する'
+              "アカウントを登録する"
             )}
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            className="text-gray-500 hover:text-[#4A2C2A] w-full" 
+
+          <Button
+            variant="ghost"
+            className="text-gray-500 hover:text-[#4A2C2A] w-full"
             onClick={handleGoToLogin}
             disabled={isLoading || isNavigating} // 何か処理中は二重クリック防止
           >
@@ -130,7 +172,7 @@ export default function UserInsertPage() {
                 読み込み中...
               </>
             ) : (
-              'すでにアカウントをお持ちの方はこちら'
+              "すでにアカウントをお持ちの方はこちら"
             )}
           </Button>
         </CardFooter>
