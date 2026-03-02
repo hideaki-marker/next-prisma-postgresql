@@ -106,14 +106,13 @@ export default function UserInsertPage() {
                 placeholder="名前を入力してください"
                 {...register("name", { required: "ユーザー名は必須です" })} // 💡 これだけで OK！
                 className="h-12 border-gray-200 focus:ring-[#4A2C2A] focus:border-[#4A2C2A]"
-                required
               />
               {/* 💡 エラーメッセージの表示 */}
               {errors.name && (
                 <p className="text-red-500 text-xs ml-1">
                   {errors.name.message}
                 </p>
-              )}
+              )}{" "}
             </div>
             <div className="space-y-2">
               <Label
@@ -134,13 +133,12 @@ export default function UserInsertPage() {
                   },
                 })}
                 className="h-12 border-gray-200 focus:ring-[#4A2C2A] focus:border-[#4A2C2A]"
-                required
               />
               {errors.password && (
                 <p className="text-red-500 text-xs ml-1">
                   {errors.password.message}
                 </p>
-              )}
+              )}{" "}
             </div>
           </form>
         </CardContent>
