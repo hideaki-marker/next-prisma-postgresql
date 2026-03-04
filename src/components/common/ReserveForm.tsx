@@ -223,16 +223,39 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
               <SelectValue placeholder="時間を選択" />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: 21 }).map((_, i) => {
-                const hour = Math.floor(i / 2) + 11;
-                const min = i % 2 === 0 ? "00" : "30";
-                const t = `${hour}:${min}`;
-                return (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                );
-              })}
+              {(() => {
+                // 💡 ループの外で「今」の時間を取得（1回だけでOK！）
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMin = now.getMinutes();
+                // 💡 ここを実際の「選択した日付」のStateと比較するようにしてね
+                // 例: const isToday = selectedDate === format(new Date(), "yyyy-MM-dd");
+                const isToday = true;
+
+                return Array.from({ length: 21 }).map((_, i) => {
+                  const hour = Math.floor(i / 2) + 11;
+                  const min = i % 2 === 0 ? "00" : "30";
+                  const t = `${hour}:${min}`;
+
+                  // 💡 判定ロジックをスッキリ整理
+                  const isPast =
+                    isToday &&
+                    (hour < currentHour ||
+                      (hour === currentHour && parseInt(min) <= currentMin));
+
+                  return (
+                    <SelectItem
+                      key={t}
+                      value={t}
+                      disabled={isPast}
+                      className={isPast ? "opacity-30 cursor-not-allowed" : ""}
+                    >
+                      {/* 💡 デバッグ用：isPastがtrueなら横に終了と出るようにする */}
+                      {t} {isPast && "(終了)"}
+                    </SelectItem>
+                  );
+                });
+              })()}
             </SelectContent>
           </Select>
         </div>
