@@ -226,11 +226,13 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
               {(() => {
                 // 💡 ループの外で「今」の時間を取得（1回だけでOK！）
                 const now = new Date();
+
+                const isToday = date
+                  ? format(date, "yyyy-MM-dd") === format(now, "yyyy-MM-dd")
+                  : false;
+
                 const currentHour = now.getHours();
                 const currentMin = now.getMinutes();
-                // 💡 ここを実際の「選択した日付」のStateと比較するようにしてね
-                // 例: const isToday = selectedDate === format(new Date(), "yyyy-MM-dd");
-                const isToday = true;
 
                 return Array.from({ length: 21 }).map((_, i) => {
                   const hour = Math.floor(i / 2) + 11;
@@ -251,7 +253,7 @@ export default function ReserveForm({ userId, tableData }: ReserveFormProps) {
                       className={isPast ? "opacity-30 cursor-not-allowed" : ""}
                     >
                       {/* 💡 デバッグ用：isPastがtrueなら横に終了と出るようにする */}
-                      {t} {isPast && "(終了)"}
+                      {t} {isPast && "「受付終了」"}
                     </SelectItem>
                   );
                 });
