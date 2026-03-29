@@ -35,56 +35,68 @@ export default async function MyPagePage() {
     );
   }
 
-  if (authToken) {
-    try {
-      // JWTを検証し、ペイロードからユーザーIDを抽出
-      const decodedToken: any = jwt.verify(
-        authToken,
-        process.env.JWT_SECRET as string,
-      ); // ★環境変数からシークレットキーを取得
-      const userId = decodedToken.id; // ★ペイロードからユーザーIDを取得
+  // ★ ここに追加！ ★
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    console.error("CRITICAL: JWT_SECRET is not configured in .env");
+    // 環境変数がない場合は、認証できないのでゲスト扱いにする（早期リターン）
+    return (
+      <div>
+        <h1 className="font-bold text-7xl mb-8 flex items-center justify-center text-red-500">
+          System Error
+        </h1>
+        <p className="flex items-center justify-center">
+          サーバー設定エラーが発生しています。管理者に連絡してください。
+        </p>
+      </div>
+    );
+  }
 
-      if (!userId) {
-        console.error("JWTにユーザーIDが含まれていません。");
-        return (
-          <div>
-            <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">
-              Restaurant italy
-            </h1>
-            <br />
-            <p className="flex items-center justify-center mb-8">
-              ようこそ！レストランイタリィへ
-            </p>
-            <br />
-            <p className="flex items-center text-6xl justify-center mb-16">
-              ゲスト様いらっしゃいませ
-            </p>
-            {/* ... その他のリンク ... */}
-          </div>
-        );
-      }
+  try {
+    // JWTを検証し、ペイロードからユーザーIDを抽出
+    const decodedToken: any = jwt.verify(authToken, jwtSecret); // ★環境変数からシークレットキーを取得
+    const userId = decodedToken.id; // ★ペイロードからユーザーIDを取得
 
-      const user = await prisma.users.findUnique({
-        where: {
-          id: Number(userId), // ★取得したユーザーIDを使用
-        },
-        select: {
-          name: true,
-        },
-      });
-
-      if (user) {
-        userName = user.name;
-      } else {
-        console.error("ユーザーが見つかりません:", userId);
-      }
-    } catch (error) {
-      console.error(
-        "認証トークンの検証またはユーザー情報の取得に失敗しました:",
-        error,
+    if (!userId) {
+      console.error("JWTにユーザーIDが含まれていません。");
+      return (
+        <div>
+          <h1 className="font-bold text-7xl mb-8 flex items-center justify-center">
+            Restaurant italy
+          </h1>
+          <br />
+          <p className="flex items-center justify-center mb-8">
+            ようこそ！レストランイタリィへ
+          </p>
+          <br />
+          <p className="flex items-center text-6xl justify-center mb-16">
+            ゲスト様いらっしゃいませ
+          </p>
+          {/* ... その他のリンク ... */}
+        </div>
       );
-      userName = null;
     }
+
+    const user = await prisma.users.findUnique({
+      where: {
+        id: Number(userId), // ★取得したユーザーIDを使用
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    if (user) {
+      userName = user.name;
+    } else {
+      console.error("ユーザーが見つかりません:", userId);
+    }
+  } catch (error) {
+    console.error(
+      "認証トークンの検証またはユーザー情報の取得に失敗しました:",
+      error,
+    );
+    userName = null;
   }
 
   return (
