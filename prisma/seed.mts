@@ -4,6 +4,16 @@ import bcrypt from "bcryptjs"; // ESM形式に合わせて修正
 
 const prisma = new PrismaClient();
 async function main() {
+  await prisma.reserveDetail.deleteMany(); // 予約とメニューを繋いでる詳細
+  await prisma.reserve.deleteMany(); // 予約本体（テーブルを参照してる）
+
+  // 2. その次に「参照されているテーブル（親）」を消す
+  await prisma.menu.deleteMany(); // メニュー
+  await prisma.menuType.deleteMany(); // カテゴリ
+  await prisma.table_loc.deleteMany(); // これで table_loc も消せるようになる！
+
+  // 3. その他
+  await prisma.users.deleteMany();
   const menuType = [
     "コース",
     "前菜",
