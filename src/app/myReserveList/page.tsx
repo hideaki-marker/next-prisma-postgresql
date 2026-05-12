@@ -6,6 +6,11 @@ import UserReserveList from "@/components/common/reserve/UserReserveList";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET as string;
+if (!JWT_SECRET) {
+  throw new Error(
+    "CRITICAL: JWT_SECRET environment variable is not set. Check your .env file.",
+  );
+}
 
 export default async function MyReserveList() {
   const cookieStore = await cookies();
@@ -48,8 +53,8 @@ export default async function MyReserveList() {
   // (Next.jsのServer Actions/PropsでDateオブジェクトを渡す際のエラー回避)
   const formattedReservations = reserves.map((rsv) => ({
     ...rsv,
-    rsv_date: rsv.rsv_date.toISOString(),
-    app_date: rsv.app_date.toISOString(),
+    rsv_date: rsv.rsv_date.toISOString() || "",
+    app_date: rsv.app_date.toISOString() || "",
     // details内のmenuやcourseのプロパティ名もスキーマに合わせる
     details: rsv.details.map((d) => ({
       quantity: d.quantity,
